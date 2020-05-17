@@ -2,23 +2,50 @@ package com.MiguelBarrios;
 
 public class Order
 {
-    private String symbol;
+     private Trade bought;
 
-    private OrderType orderType;
+     private Trade sold;
 
-    //requested price
-    private double price;
+     private Stats stats;
 
-    public Order(String symbol, OrderType orderType, double price)
+    public Order(Trade bought)
     {
-        this.symbol = symbol;
-        this.orderType = orderType;
-        this.price = price;
+        this.bought = bought;
+        sold = null;
     }
 
-    @Override
-    public String toString()
+    public void close(Trade sell)
     {
-        return  orderType + " " + symbol + " " + price;
+        this.sold = sell;
+    }
+
+    public static Order placeOrder()
+    {
+        return null;
+    }
+
+    public static OrderType eval()
+    {
+        return null;
+    }
+
+    public String getSymbol()
+    {
+        return bought.getSymbol();
+    }
+
+    public int positionSize()
+    {
+        return bought.getNumberOfShares();
+    }
+
+    public double boughtFor()
+    {
+        return bought.getTotalPrice();
+    }
+
+    public double soldFor()
+    {
+        return sold.getTotalPrice();
     }
 }
