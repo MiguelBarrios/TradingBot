@@ -1,0 +1,99 @@
+package com.MiguelBarrios;
+
+import com.opencsv.CSVWriter;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
+public class Log
+{
+    public static SimpleDateFormat yearMonth = new SimpleDateFormat("yyyy-MM");
+    public static SimpleDateFormat yearMonthDay = new SimpleDateFormat("yyyy-MM-dd");
+
+
+    private static String mainDirectory = "/Users/miguelbarrios/Documents/Projects/Logs/";
+
+
+    private static File tradesFile;
+    private static File ordersFile;
+
+    public Log()
+    {
+        //Initilize files and directories
+        tradesFile =  mkdir("Trades");
+        String[] tradesHeader = {"Trade Type", "Symbol", "amount", "Idv Price", "Total  Price", "TOE"};
+        addHeader(tradesFile, tradesHeader);
+
+
+        ordersFile = mkdir("Orders");
+        String[] orderHeader = {"Symbol", "Type", "Bought Price", "Type", "Sold Price", "Profit"};
+        addHeader(ordersFile, orderHeader);
+
+    }
+
+    private File mkdir(String directory)
+    {
+        Date cur = new Date();
+
+        //Make directory if DNE
+        String directoryPath = mainDirectory + directory + "/" + yearMonth.format(cur);
+        (new File(directoryPath)).mkdirs();
+
+        return new File(directoryPath + "/" + yearMonthDay.format(cur) + ".csv");
+
+    }
+
+    public static void addHeader(File file, String[] header)
+    {
+
+        try{
+            // Ad header to Trades File
+            FileWriter outputfile = new FileWriter(file);
+            CSVWriter writer = new CSVWriter(outputfile);
+
+            writer.writeNext(header);
+
+            writer.close();
+
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error: File not created");
+        }
+
+    }
+
+    public static void saveOrder(Order order)
+    {
+        try{
+            FileWriter outputfile = new FileWriter(ordersFile, true);
+            CSVWriter writer = new CSVWriter(outputfile);
+
+            writer.writeNext(order.cvsFormat());
+
+            writer.close();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveTrade(Trade trade)
+    {
+        try{
+            FileWriter outputfile = new FileWriter(tradesFile, true);
+            CSVWriter writer = new CSVWriter(outputfile);
+
+            writer.writeNext(trade.cvsFormat());
+
+            writer.close();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+}
