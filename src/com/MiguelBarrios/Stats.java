@@ -2,70 +2,109 @@ package com.MiguelBarrios;
 
 public class Stats
 {
-    //Will be used to calculate average asks.
-    private double[] askList;
+    private static double DEFAULT_FACTOR = 0.02;
 
-    //Summation of askList
-    private double sumAsk;
+    private double initialPrice;
 
-    // sumAsk / size
-    private double averageAsk;
+    private double currentPrice;
 
-    //  slope = prevAverage - averageAsk;
-    //  slope < 0 : increasing
-    //  slope > 0 : decreasing
-    private double slope;
+    private double absoluteMax;
 
-    //current index in askList and bidList
-    private int index;
+    private double absoluteMin;
 
-    private int size;
+    private double percentChange;
 
-    public Stats(int size)
+    private boolean shortPosition;
+
+    private double sellPrice;
+
+    private double factor;
+
+    public Stats(double initialPrice, OrderType type)
     {
-        askList = new double[size];
-        sumAsk = 0;
-        averageAsk = 0;
-        index = 0;
-        slope = '0';
-        this.size = size;
+        this(initialPrice, type, DEFAULT_FACTOR);
+    }
+
+    public Stats(double initialPrice, OrderType type, double factor)
+    {
+        this.initialPrice = initialPrice;
+
+        currentPrice = initialPrice;
+
+        absoluteMax = initialPrice;
+
+        absoluteMin = initialPrice;
+
+        percentChange = 0;
+
+
+        shortPosition = (type == OrderType.SHORT) ? true : false;
+
+        if(shortPosition)
+        {
+            sellPrice = absoluteMin  + (absoluteMin * factor);
+        }
+        else
+        {
+            sellPrice = absoluteMax - (absoluteMax * factor);
+        }
+
+        this.factor = factor;
+    }
+
+    public OrderType update(double price)
+    {
+        currentPrice = price;
+
+        //Update Absolute Max and Min
+        if(currentPrice > absoluteMax) {
+            absoluteMax = currentPrice;
+        }
+        else if(currentPrice < absoluteMin) {
+            absoluteMin = currentPrice;
+        }
+
+        percentChange =  Math.round((1 - initialPrice/currentPrice) * 1000) / 1000.0;
+
+        if(shortPosition)
+        {
+            sellPrice = absoluteMin  + (absoluteMin * factor);
+            if(currentPrice >= sellPrice)
+                return OrderType.SELL;
+        }
+        else
+        {
+            sellPrice = absoluteMax - (absoluteMax * factor);
+            if(currentPrice <= sellPrice || currentPrice < initialPrice)
+                return OrderType.SELL;
+        }
+
+        return OrderType.HOLD;
     }
 
 
-    public void update(double askPrice, double bidPrice)
+    public double getPercentChange()
     {
-        //circular array
-        if(index >= size)
-            index = 0;
-
-        sumAsk -= askList[index];
-        sumAsk += askPrice;
-        askList[index] = askPrice;
-
-        double prevAverage = averageAsk;
-
-        averageAsk = ((int)(sumAsk / size * 100)) / 100.0;
-
-        slope = prevAverage - averageAsk;
-
-        ++index;
+        return percentChange;
     }
 
-    public double getSumAsk()
+    public double getAbsoluteMax()
     {
-        return sumAsk;
+        return absoluteMax;
     }
 
-
-    public double getAverageAsk()
+    public double getAbsoluteMin()
     {
-        return averageAsk;
-    }
-    
-    public double getSlope()
-    {
-        return slope;
+        return absoluteMin;
     }
 
+    public double getCurrentPrice()
+    {
+        return currentPrice;
+    }
 
+    public double getInitialPrice()
+    {
+        return initialPrice;
+    }
 }

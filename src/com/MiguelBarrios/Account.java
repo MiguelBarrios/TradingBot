@@ -1,51 +1,118 @@
 package com.MiguelBarrios;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 public class Account
 {
+    //Initial funds
+    private double startingFunds;
+
     //Funds available for trading
     private double availableFunds;
 
+    //Max price willing to pay for individual stocks
+    private double maxPrice;
+
+    //Number of shares to be purchased
+    private int positionSize;
+
     //amount made from from closed postions
-    private double profit;
+    private double totalProfit;
 
     //All currently active postions
-    private HashMap<String, Order> positions;
+    private HashMap<String, Order> activeOrders;
 
-    //closed positions
-    private LinkedList<Order> closedPositions;
+    //closed activeOrders
+    private HashSet<String> closedOrders;
 
-    public Account(double availableFunds)
+
+    public Account(double availableFunds, double maxPrice, int positionSize, boolean simulation)
     {
+        this.startingFunds = availableFunds;
         this.availableFunds = availableFunds;
-        this.profit = 0;
-        positions = new HashMap<>();
-        closedPositions = new LinkedList<>();
+        this.maxPrice = maxPrice;
+        this.positionSize = positionSize;
+        this.totalProfit = 0;
+        activeOrders = new HashMap<>();
+        closedOrders = new HashSet<>();
+
+        //initialize all logs for today
+        Log log = new Log();
+
+        TDARequest.simulation = simulation;
     }
 
-    public void addNewPosition(Order order)
+    public boolean isEligible(Quote quote)
     {
-        positions.put(order.getSymbol(), order);
-        availableFunds -= order.boughtFor();
+        String symbol = quote.getSymbol();
+        Double price = quote.getAskPrice();
+
+        //Check to see if we already hold the stock, or have already held the stock
+        if(activeOrders.containsKey(symbol) || closedOrders.contains(symbol)) {
+            return false;
+        }
+
+        //Check to see if we have enough money to complete the initialPurchase, with and increase of 1% to cover market price
+        double fundsNeeded = ((1.0 / price) + price) * positionSize;
+        if(fundsNeeded > availableFunds) {
+            return false;
+        }
+
+        //check to see if price is less then the max you are willing to pay for it
+        if(price > maxPrice) {
+            return false;
+        }
+
+        return true;
     }
+
+    public boolean initialPurchase(String symbol)
+    {
+
+        Trade trade = TDARequest.placeOrder(symbol, OrderType.BUY,positionSize);
+        Order order = new Order(trade);
+
+        //add order to currently held orders
+        activeOrders.put(symbol, order);
+        availableFunds -= order.boughtFor();
+
+        System.out.println(trade);
+        return true;
+
+    }
+
+    public Set<String> getKeySet()
+    {
+        return activeOrders.keySet();
+    }
+
+    public void closeAllPositions()
+    {
+        for(String key : activeOrders.keySet())
+        {
+            Order order = activeOrders.get(key);
+            Trade trade = TDARequest.placeOrder(order.getSymbol(), OrderType.SELL, order.positionSize());
+            order.close(trade);
+            totalProfit += order.soldFor();
+        }
+    }
+
+    public void printSummary()
+    {
+        System.out.println("Account Summary");
+        System.out.println("Remaining funds: " + availableFunds);
+        System.out.println("Todays Profits: " + ((totalProfit + availableFunds) - startingFunds));
+    }
+
 
     public void closePosition(Order order)
     {
-        Trade trade = Request.placeOrder(order.getSymbol(), OrderType.SELL, order.positionSize());
+        Trade trade = TDARequest.placeOrder(order.getSymbol(), OrderType.SELL, order.positionSize());
         order.close(trade);
 
-        positions.remove(order.getSymbol());
-        closedPositions.add(order);
-        profit += order.soldFor();
-
-    }
-
-    public boolean hasSufficientFunds(Quote quote)
-    {
-        return true;
+        activeOrders.remove(order.getSymbol());
+        closedOrders.add(order.getSymbol());
+        totalProfit += order.soldFor();
     }
 
     public double availableFunds()
@@ -53,23 +120,30 @@ public class Account
         return availableFunds;
     }
 
-    public boolean hasStake(String symbol)
-    {
-        return positions.containsKey(symbol);
-    }
-
-    public boolean hasOpenPositions()
-    {
-        return (positions.size() >= 1);
-    }
 
     public Order getOrder(String symbol)
     {
-        return null;
+        return activeOrders.get(symbol);
+    }
+
+    public ArrayList<Quote> getActivePositionsQuotes()
+    {
+        ArrayList<String> symbols = new ArrayList<>(activeOrders.size());
+        for(String key : activeOrders.keySet())
+        {
+            symbols.add(key);
+        }
+
+        return TDARequest.getQuotes(symbols);
+    }
+
+    public double getAvailableFunds()
+    {
+        return availableFunds;
     }
 
     public Set<String> keySet()
     {
-        return positions.keySet();
+        return activeOrders.keySet();
     }
 }

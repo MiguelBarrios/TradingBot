@@ -27,6 +27,7 @@ public class Quote
         this.shortable = shortable;
     }
 
+
     @Override
     public String toString()
     {
@@ -38,5 +39,40 @@ public class Quote
                 ", askSize=" + askSize +
                 ", netChange=" + netChange +
                 ", shortable=" + shortable;
+    }
+
+    public String getSymbol()
+    {
+        return symbol;
+    }
+
+    public double getBidprice()
+    {
+        return bidprice;
+    }
+
+    public int getBidSize()
+    {
+        return bidSize;
+    }
+
+    public double getAskPrice()
+    {
+        return askPrice;
+    }
+
+    public int getAskSize()
+    {
+        return askSize;
+    }
+
+    public double getNetChange()
+    {
+        return netChange;
+    }
+
+    public boolean isShortable()
+    {
+        return shortable;
     }
 }

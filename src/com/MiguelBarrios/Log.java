@@ -30,7 +30,7 @@ public class Log
 
 
         ordersFile = mkdir("Orders");
-        String[] orderHeader = {"Symbol", "Type", "Bought Price", "Type", "Sold Price", "Profit"};
+        String[] orderHeader = {"Symbol", "Bought Price", "Sold Price","Profit", "Change", "Max", "Min"};
         addHeader(ordersFile, orderHeader);
 
     }

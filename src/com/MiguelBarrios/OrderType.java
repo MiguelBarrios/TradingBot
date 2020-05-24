@@ -4,6 +4,7 @@ public enum OrderType
 {
     BUY("BUY"),
     SELL("SELL"),
+    HOLD("HOLD"),
     SHORT("SHORT");
 
     private String type;

@@ -1,5 +1,7 @@
 package com.MiguelBarrios;
 
+import jdk.swing.interop.SwingInterOpUtils;
+
 public class Order
 {
      private Trade bought;
@@ -11,22 +13,54 @@ public class Order
     public Order(Trade bought)
     {
         this.bought = bought;
+        this.stats = new Stats(bought.getPrice(), bought.getOrderType());
         sold = null;
     }
 
-    public void close(Trade sell)
+    public String status()
     {
-        this.sold = sell;
+        //TODO: MAKE MORE READABLE
+        double profit = stats.getCurrentPrice() - stats.getInitialPrice();
+        return String.format("%s: %.3f %.3f",bought.getSymbol(), profit, stats.getPercentChange());
     }
 
-    public static Order placeOrder()
+    public OrderType update()
     {
-        return null;
+        Quote quote = TDARequest.getQuote(bought.getSymbol());
+        return stats.update(quote.getAskPrice());
     }
 
-    public static OrderType eval()
+    public OrderType update(double price)
     {
-        return null;
+        return stats.update(price);
+    }
+
+    public String[] cvsFormat()
+    {
+        if(bought.getSymbol() != sold.getSymbol())
+        {
+            System.out.println("ERROR in Orders modual:\nMISSMATCHED trades ");
+            System.out.println(bought);
+            System.out.println(sold + "\n\n");
+        }
+
+        double profit = sold.getTotalPrice() - bought.getTotalPrice();
+        String[] arr = {
+                bought.getSymbol(),
+                String.valueOf(bought.getTotalPrice()),
+                String.valueOf(sold.getTotalPrice()),
+                String.valueOf(profit),
+                String.valueOf(stats.getPercentChange()),
+                String.valueOf(stats.getAbsoluteMax()),
+                String.valueOf(stats.getAbsoluteMin())
+        };
+        return arr;
+    }
+
+    public void close(Trade trade)
+    {
+        this.sold = trade;
+        Log.saveOrder(this);
     }
 
     public String getSymbol()
@@ -48,4 +82,11 @@ public class Order
     {
         return sold.getTotalPrice();
     }
+
+    public double getPercentChange()
+    {
+        return stats.getPercentChange();
+    }
+
+
 }

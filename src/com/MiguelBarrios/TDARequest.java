@@ -1,10 +1,83 @@
 package com.MiguelBarrios;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class TDARequest
 {
+	public static boolean simulation = false;
+
+	public static Trade placeOrder(String symbol, OrderType type, int numShares)
+	{
+		if(type == OrderType.BUY)
+		{
+			Trade trade =  buy(symbol, numShares);
+			Log.saveTrade(trade);
+			return trade;
+		}
+		else if(type == OrderType.SELL)
+		{
+			Trade trade = sell(symbol,numShares);
+			Log.saveTrade(trade);
+			return trade;
+		}
+
+		return null;
+	}
+
+
+	public static Trade buy(String symbol, int numShares)
+	{
+		if(simulation)
+		{
+			Quote quote = getQuote(symbol);
+			return new Trade(OrderType.BUY, numShares, quote.getAskPrice(), symbol);
+		}
+		else
+		{
+			//TODO: execute buy order
+		}
+
+		return null;
+	}
+
+	public static Trade sell(String symbol, int numShares)
+	{
+		if(simulation)
+		{
+			Quote quote = getQuote(symbol);
+			return new Trade(OrderType.SELL, numShares, quote.getBidprice(), symbol);
+		}
+		else
+		{
+			//TODO: EXECUTE SELL ORDER
+		}
+
+		return null;
+	}
+
+
+
+
+	//Complete
+	public static Market marketHours()
+	{
+		int month = ZonedDateTime.now().getDayOfMonth();
+		int day = ZonedDateTime.now().getMonthValue();
+		int year = ZonedDateTime.now().getYear();
+
+		String request =  String.format("https://api.tdameritrade.com/v1/marketdata/EQUITY/hours?apikey=%s&date=%4d-%02d-%02d",
+				Config.apiKey, year, day, month);
+
+		String response = Client.sendRequest(request);
+
+		Market hours = Parser.parseMarketHours(response);
+
+		return hours;
+
+	}
+
 	//Complete
 	public static String getAccountInfo()
 	{
@@ -22,7 +95,7 @@ public class TDARequest
 	}
 
 	//Complete
-	public static ArrayList<Quote> getQuotes(String[] arr)
+	public static ArrayList<Quote> getQuotes(ArrayList<String> arr)
 	{
 		StringBuilder test = new StringBuilder();
 		for(String symbol : arr)
@@ -77,6 +150,7 @@ public class TDARequest
 		return combined;
 	}
 
+	//Need to update refresh token july 24
 	//Complete
 	public static String refreshAuthToken()
 	{
@@ -94,19 +168,4 @@ public class TDARequest
 
 	}
 }
-
-/*
-OkHttpClient client = new OkHttpClient().newBuilder()
-  .build();
-MediaType mediaType = MediaType.parse("application/json");
-RequestBody body = RequestBody.create(mediaType, "{\n  \"orderType\": \"MARKET\",\n  \"session\": \"NORMAL\",\n  \"duration\": \"DAY\",\n  \"orderStrategyType\": \"SINGLE\",\n  \"orderLegCollection\": [\n    {\n      \"instruction\": \"Buy\",\n      \"quantity\": 1,\n      \"instrument\": {\n        \"symbol\": \"ET\",\n        \"assetType\": \"EQUITY\"\n      }\n    }\n  ]\n}");
-Request request = new Request.Builder()
-  .url("https://api.tdameritrade.com/v1/accounts/496820767/orders")
-  .method("POST", body)
-  .addHeader("Authorization", "Bearer euLlUipASvTqKg6PUCYY2Sx8wKAbppuruUmUUrniP6tqm22mJ6qyjY0bmPPGhm4t3OKhoywMPJAfoVHu/CBRf1sBnq4Cn49HYUhOpck+kteguMk/4A67XAzcRu13P/d5v72brY8KqEqheIucJYMMlPo2YatVyt6GzXRnE6fjqANDmCQ1hHJfFbfDJbg4GumPieAMgaTrfawb4vgHaZpwvwm284/+eGEf3fUIbuc2jabCMKzsWhSp94jUUttREQx7XDY8GqZ/TZiiJCjgAWj4JsBcKc78CIbmArrIcHwA1pMZ0pEwfQNz9hmKie4kpMqB/7ZQGViiy5XkM4kHAyJVUwnsXCbUjHfJ0nya9NrSlIw+7J4FQkdazMuY1Ig1A50Xu8VKUXN9A+xeR6mVAs5DId0lXgUMncAw6RjkqHNfkeltU8k9Ut2dkQrfF0q8hKZ9HI0Rljd9j7u2qf29vEfE4/0sbEQ7RXj//NfTvVrLgbKmhrqZmrhuJj9XCwedFJeBFzLH2J2ExSpy71SoxrMcXog530FsI/Ydgd/dKPBEI5CqLZYKb100MQuG4LYrgoVi/JHHvl2g3KWE6gudF/Mrh1KhZbHpZevqBevz4u1v9CA2UCVUi2lU0uRDNjmQOSE9DNe+heJhmWRNFNlDaxeIalNHX7qGlY5h226B1ryVR5gDQfOZu+9VTPsSFe9xs1QqNZzIsLhumIzm9VHRPVFE03w4iMHCpDA9RBDNpUsI8rrM7XmpOIVT8UrUptmDZ0wOY61f/noPmCSPvutFaD0iaTZer6jjFwhhHvcI+F5cvmXSeefPNYbcdldxxxDs1k5f7N6wtoZ4/9Wu07vZ+KPOrTM06IoHFzjufqTSZH4PqiJX8qZ0Rih2EtIF2Tx3MOvYskHKHAJh0jIpw/9T3tR28NrG9rV+hZTWf461gF8JCv9C111JzWvfJsGBUZXvYuoCYbwbTC9md21my3cPzDymKFO0XPR6/XiiV2Pqr83R9vEWPz2WQJmQ2IxmLE/J9u62QsGCWTiZRHbWoDEZuyIHB5F3/8tXkH0jknZs2v8CxH2x5WzDNI+t42rAkBzmUHuoJhgS3xcCWDIWwpATKEvpil0Me3KBpolLK2jzlP/97TJVdRCQGPAHDA==212FD3x19z9sWBHDJACbC00B75E")
-  .addHeader("Content-Type", "application/json")
-  .build();
-Response response = client.newCall(request).execute();
-
- */
 

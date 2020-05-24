@@ -1,7 +1,19 @@
 package com.MiguelBarrios;
 
+import com.opencsv.CSVWriter;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+
 public class Trade
 {
+    public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
     private String symbol;
 
     private OrderType orderType;
@@ -12,7 +24,22 @@ public class Trade
 
     private double totalPrice;
 
-    private long time;
+    private Date time;
+
+    public String[] cvsFormat()
+    {
+        String[] arr = {
+                orderType.toString(),
+                symbol,
+                String.valueOf(numberOfShares),
+                String.valueOf(price),
+                String.valueOf(totalPrice),
+                time.toString()
+                        };
+
+        return arr;
+    }
+
 
     public Trade(OrderType type, int numberOfShares, double price, String symbol)
     {
@@ -21,7 +48,7 @@ public class Trade
         this.symbol = symbol;
         this.price = price;
         totalPrice = price * numberOfShares;
-        time = System.currentTimeMillis();
+        time = new Date();
     }
 
     public String getSymbol()
@@ -49,21 +76,20 @@ public class Trade
         return totalPrice;
     }
 
-    public long getTime()
+    public String getTime()
     {
-        return time;
+        return timeFormat.format(time);
     }
 
     @Override
     public String toString()
     {
-        return "Trade{" +
-                "symbol = '" + symbol + '\'' +
-                ", orderType = " + orderType +
-                ", numberOfShares = " + numberOfShares +
-                ", price = " + price +
+        return  orderType +
+                " " +numberOfShares +
+                " " + symbol  +
+                " price = " + price +
                 ", totalPrice = " + totalPrice +
-                ", time = " + time +
-                '}';
+                ", time = " + time;
     }
+
 }
