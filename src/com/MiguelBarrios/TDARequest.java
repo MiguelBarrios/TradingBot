@@ -28,13 +28,15 @@ public class TDARequest
 	public static String EQUITY = "EQUITY";
 
 
-	public static boolean simulation = false;
+	public static boolean simulation = true;
 
 	public static Trade placeOrder(String symbol, OrderType type, int numShares)
 	{
 		if(!simulation) {
 			String order = OrderBuilder.marketOrder(type.toString(), symbol, numShares);
-			Client.placeOrder(order);
+			String response = Client.placeOrder(order);
+
+			System.out.println(response);
 		}
 
 		//TODO: find a way to check the price if simulation is off, then everthing below is unnesesary
@@ -86,11 +88,20 @@ public class TDARequest
 	//Complete
 	public static ArrayList<Quote> getQuotes(ArrayList<String> arr)
 	{
+
+		if(arr.size() == 0)
+		{
+			return new ArrayList<>();
+		}
+
+
 		StringBuilder test = new StringBuilder();
 		for(String symbol : arr)
 		{
 			test.append(symbol.trim() + ",");
 		}
+
+
 
 		String symbols = test.substring(0, test.length() - 1);
 

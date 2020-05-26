@@ -4,6 +4,12 @@ import java.util.*;
 
 public class Account
 {
+    public static final String RED = "\033[0;31m";     // RED
+    public static final String GREEN = "\033[0;32m";   // GREEN
+    public static final String RESET = "\033[0m";  // Text Reset
+
+
+
     //Initial funds
     private double startingFunds;
 
@@ -12,6 +18,8 @@ public class Account
 
     //Max price willing to pay for individual stocks
     private double maxPrice;
+
+    private double minPrice;
 
     //Number of shares to be purchased
     private int positionSize;
@@ -26,10 +34,11 @@ public class Account
     private HashSet<String> closedOrders;
 
 
-    public Account(double availableFunds, double maxPrice, int positionSize, boolean simulation)
+    public Account(double availableFunds,double minPrice, double maxPrice, int positionSize, boolean simulation)
     {
         this.startingFunds = availableFunds;
         this.availableFunds = availableFunds;
+        this.minPrice = minPrice;
         this.maxPrice = maxPrice;
         this.positionSize = positionSize;
         this.totalProfit = 0;
@@ -42,13 +51,14 @@ public class Account
         TDARequest.simulation = simulation;
     }
 
+
     public boolean isEligible(Quote quote)
     {
         String symbol = quote.getSymbol();
         Double price = quote.getAskPrice();
 
         //check to see if price is less then the max you are willing to pay for it
-        if(price > maxPrice) {
+        if(price > maxPrice || price < minPrice) {
             return false;
         }
 
@@ -88,11 +98,14 @@ public class Account
 
     public void closeAllPositions()
     {
-        for(String key : activeOrders.keySet())
+        Set<String> set = getKeySet();
+
+        for(String str : set)
         {
-            Order order = activeOrders.get(key);
-            closePosition(order);
+            closePosition(activeOrders.get(str));
+            //Order cur = activeOrders.remove(str);
         }
+
     }
 
     public void printSummary()
@@ -106,11 +119,23 @@ public class Account
     public Order closePosition(Order order)
     {
         Trade trade = TDARequest.placeOrder(order.getSymbol(), OrderType.SELL, order.positionSize());
+
         order.close(trade);
 
         activeOrders.remove(order.getSymbol());
         closedOrders.add(order.getSymbol());
         totalProfit += order.soldFor();
+
+        if(order.soldFor() >= order.boughtFor())
+        {
+            System.out.print(GREEN + "\n" + trade);
+        }
+        else
+        {
+            System.out.print(RED + "\n" + trade);
+        }
+
+        System.out.println(RESET);
 
         return order;
     }
@@ -128,13 +153,23 @@ public class Account
 
     public ArrayList<Quote> getActivePositionsQuotes()
     {
+        if(activeOrders.size() == 0)
+            return new ArrayList<>();
+
+
         ArrayList<String> symbols = new ArrayList<>(activeOrders.size());
         for(String key : activeOrders.keySet())
         {
             symbols.add(key);
         }
 
+
         return TDARequest.getQuotes(symbols);
+    }
+
+    public int numberActivePosition()
+    {
+        return activeOrders.size();
     }
 
     public double getAvailableFunds()

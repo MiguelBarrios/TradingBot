@@ -75,7 +75,7 @@ public class Stats
         else
         {
             sellPrice = absoluteMax - (absoluteMax * factor);
-            if(currentPrice <= sellPrice || currentPrice < initialPrice)
+            if(currentPrice <= sellPrice)
                 return OrderType.SELL;
         }
 

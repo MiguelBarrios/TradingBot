@@ -104,13 +104,17 @@ public class Parser
 
     public static ArrayList<Quote> parseQuotes(String quotesString,ArrayList<String> stocks)
     {
+        if(stocks.size() == 0)
+            return new ArrayList<>();
+
+
         ArrayList<Quote> quotes = new ArrayList<>(stocks.size());
 
-        JSONObject response = new JSONObject(quotesString);
 
         for(String symbol : stocks)
         {
             try{
+                JSONObject response = new JSONObject(quotesString);
                 JSONObject obj = response.getJSONObject(symbol);
                 double bidprice = obj.getDouble("bidPrice");
                 int bidSize = obj.getInt("bidSize");

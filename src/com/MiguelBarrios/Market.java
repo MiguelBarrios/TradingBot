@@ -53,7 +53,7 @@ public class Market
 
         //Sets time ahead 5 minuts becuase we
         //Dont want to trade in after hours due to decrease liquidity
-        cur.setMinutes(cur.getMinutes() + 5);
+        cur.setMinutes(cur.getMinutes());
 
         //TODO: simplify logic
         if(!pre && !afterHours)

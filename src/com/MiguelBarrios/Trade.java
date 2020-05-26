@@ -5,6 +5,7 @@ import com.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -25,6 +26,8 @@ public class Trade
     private double totalPrice;
 
     private Date time;
+
+    public static final DecimalFormat format = new DecimalFormat("####.###");
 
     public String[] cvsFormat()
     {
@@ -84,12 +87,17 @@ public class Trade
     @Override
     public String toString()
     {
+        return String.format("%4s %d %4s %+3.3f %+3.3f %s", orderType, numberOfShares, symbol, price, totalPrice, time);
+
+        /*
         return  orderType +
                 " " +numberOfShares +
                 " " + symbol  +
                 " price = " + price +
                 ", totalPrice = " + totalPrice +
                 ", time = " + time;
+
+                */
     }
 
 }

@@ -8,21 +8,36 @@ import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 
+/*
+ If you are buying a stock you are going to get the ask price.
+
+ If you are selling a stock, you are going to get the bid price,
+
+ */
+
+
 public class Main
 {
+    public static final String RED = "\033[0;31m";     // RED
+    public static final String GREEN = "\033[0;32m";   // GREEN
+
+    public static final String RESET = "\033[0m";  // Text Reset
+
+
+
 
     public static void main(String[] args)
     {
 
+
         Twilio.init(Config.ACCOUNT_SID, Config.AUTH_TOKEN);
 
         //-------------------------------------------------------------------------------------------------------------
-        Account account = new Account(50, 10, 1, true);
+        Account account = new Account(5000,0, 1000, 1, true);
 
         //Get authentication token
         String authToken = TDARequest.refreshAuthToken();
         Config.updateAuthToken(authToken);
-        System.out.println("Auth Token: \n" + authToken);
 
 
         //All stocks previously encountered
@@ -39,59 +54,92 @@ public class Main
 
         long startTime = System.currentTimeMillis();
 
-        while(market.isOpen(false, false))
+        for(int i = 0; i < 2; ++i)
+        //while(market.isOpen(false, false))
         {
 
             ArrayList<String> trendingUp = new ArrayList<>(20);
 
             //get symbols that we have not see before
-            for(String symbol : TDARequest.allTopMovers("up"))
+            String[] movers = TDARequest.allTopMovers("up");
+
+            if(movers != null)
             {
-                if(!previouslyEncountered.contains(symbol))
+                for(String symbol : movers)
                 {
-                    trendingUp.add(symbol);
-                    previouslyEncountered.add(symbol);
+                    if(!previouslyEncountered.contains(symbol))
+                    {
+                        trendingUp.add(symbol);
+                        previouslyEncountered.add(symbol);
+                    }
                 }
             }
+
 
             //Get quotes and initialPurchase all newly encountered movers trending up
-            for(Quote quote : TDARequest.getQuotes(trendingUp))
+            ArrayList<Quote> quotesMovers = TDARequest.getQuotes(trendingUp);
+
+            if(quotesMovers != null)
             {
-                if(account.isEligible(quote))
+                for(Quote quote : quotesMovers)
                 {
-                    account.initialPurchase(quote.getSymbol());
+                    if(account.isEligible(quote))
+                    {
+                        account.initialPurchase(quote.getSymbol());
+                    }
                 }
             }
 
-            //Check the status of all active positions
-            for(int i = 0; i < 5; ++i)
+            if(account.numberActivePosition() == 0 )
             {
-
-                StringBuilder display = new StringBuilder();
-                for (Quote quote :  account.getActivePositionsQuotes())
+                System.out.println("No Holdings");
+                pause(10);
+            }
+            else
+            {
+                //Check the status of all active positions
+                for(int j = 0; j < 5; ++j)
                 {
-                    Order order = account.getOrder(quote.getSymbol());
-                    OrderType recommendation = order.update(quote.getBidprice());
 
-                    display.append(order.status() + ", ");
+                    ArrayList<Quote> quotes =  account.getActivePositionsQuotes();
 
-                    if (recommendation == OrderType.SELL) {
-                        Order completedOrder = account.closePosition(order);
+                    for (Quote quote :  quotes)
+                    {
+                        Order order = account.getOrder(quote.getSymbol());
+                        OrderType recommendation = order.update(quote.getBidprice());
+
+                        if(order.change())
+                        {
+                            System.out.print(GREEN + order.status() + ",");
+                        }
+                        else
+                        {
+                            System.out.print(RED + order.status() + ",");
+                        }
+
+                        if (recommendation == OrderType.SELL) {
+                            Order completedOrder = account.closePosition(order);
+
+                        /*
                         Message message = Message.creator(
                                 new com.twilio.type.PhoneNumber(Config.myPhoneNum), //To
                                 new com.twilio.type.PhoneNumber(Config.sendPhoneNum), //From
                                 completedOrder.smsFormat()) //Message
                                 .create();
-
+                                */
+                        }
                     }
+
+
+                    pause(1);
+
+                    //TODO: print in color
+                    //format text so that they all take up the same amount of space and alighne
+                    System.out.println(RESET);
                 }
 
-                try { TimeUnit.SECONDS.sleep(1); }
-                catch (Exception e) { e.printStackTrace(); }
-
-                System.out.println("\n" + display.toString());
-
             }
+
 
             //Check to see if we need to refresh auth Token
             long timePassed = System.currentTimeMillis() - startTime;
@@ -103,23 +151,32 @@ public class Main
             }
 
         }
+
+
+
         System.out.println("Closing all open Positions");
 
-        //Close all active orders
-        for(String key: account.getKeySet())
-        {
-            Order order = account.getOrder(key);
-            account.closePosition(order);
 
-            Message message = Message.creator(
-                    new com.twilio.type.PhoneNumber(Config.myPhoneNum), //To
-                    new com.twilio.type.PhoneNumber(Config.sendPhoneNum), //From
-                    order.smsFormat()) //Message
-                    .create();
+        //TODO: works figure out how to do it with iterator, without getting concurrent modification exception
+        ArrayList<Quote> quotes =  account.getActivePositionsQuotes();
+        for(Quote quote : quotes) {
+            Order order = account.getOrder(quote.getSymbol());
+            account.closePosition(order);
         }
 
 
         account.printSummary();
+    }
+
+
+    public static void pause(long time)
+    {
+        try {
+            TimeUnit.SECONDS.sleep(time);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

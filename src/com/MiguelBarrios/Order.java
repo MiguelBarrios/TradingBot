@@ -20,8 +20,19 @@ public class Order
     public String status()
     {
         //TODO: MAKE MORE READABLE
-        double profit = stats.getCurrentPrice() - stats.getInitialPrice();
-        return String.format("\n%s: %.3f %.3f",bought.getSymbol(), profit, stats.getPercentChange());
+        return String.format("%4s: %+.3f",bought.getSymbol(), stats.getPercentChange());
+    }
+
+    public boolean change()
+    {
+        if(stats.getPercentChange() >= 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public OrderType update()
@@ -92,6 +103,10 @@ public class Order
     public double getPercentChange()
     {
         return stats.getPercentChange();
+    }
+    public double currentPrice()
+    {
+        return stats.getCurrentPrice();
     }
 
 }
