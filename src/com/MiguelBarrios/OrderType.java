@@ -2,8 +2,8 @@ package com.MiguelBarrios;
 
 public enum OrderType
 {
-    BUY("BUY"),
-    SELL("SELL"),
+    BUY("Buy"),
+    SELL("Sell"),
     HOLD("HOLD"),
     SHORT("SHORT");
 

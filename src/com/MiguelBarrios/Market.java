@@ -49,8 +49,11 @@ public class Market
     {
         Date cur = new Date(System.currentTimeMillis());
 
-        //TODO: instead see if we can set hours to EST in constructor
         cur.setHours(cur.getHours() + 1);
+
+        //Sets time ahead 5 minuts becuase we
+        //Dont want to trade in after hours due to decrease liquidity
+        cur.setMinutes(cur.getMinutes() + 5);
 
         //TODO: simplify logic
         if(!pre && !afterHours)

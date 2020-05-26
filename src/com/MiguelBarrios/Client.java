@@ -107,6 +107,10 @@ public class Client
         return null;
     }
 
+
+
+    //WORKS!!!!!!!!!!!!
+    //Remove is place order works
     public static String buyStock()
     {
         String urlString = "https://api.tdameritrade.com/v1/accounts/" + Config.accountID + "/orders";
@@ -116,42 +120,83 @@ public class Client
 
             HttpsURLConnection httpURLConnection = (HttpsURLConnection)url.openConnection();
             httpURLConnection.setRequestMethod("POST");
-            httpURLConnection.setDoOutput(true);
-
-
-            JSONObject jsonObject = null;
-            try {
-                jsonObject = new JSONObject("{\n" +
-                        "  \"orderType\": \"MARKET\",\n" +
-                        "  \"session\": \"NORMAL\",\n" +
-                        "  \"duration\": \"DAY\",\n" +
-                        "  \"orderStrategyType\": \"SINGLE\",\n" +
-                        "  \"orderLegCollection\": [\n" +
-                        "    {\n" +
-                        "      \"instruction\": \"Buy\",\n" +
-                        "      \"quantity\": 1,\n" +
-                        "      \"instrument\": {\n" +
-                        "        \"symbol\": \"ET\",\n" +
-                        "        \"assetType\": \"EQUITY\"\n" +
-                        "      }\n" +
-                        "    }\n" +
-                        "  ]\n" +
-                        "}");
-
-            }catch (JSONException err){
-                err.printStackTrace();
-            }
-            String post_data = jsonObject.toString();
-
-            OutputStream outputStream = httpURLConnection.getOutputStream();
-            outputStream.write(post_data.getBytes());
-            outputStream.flush();
-            outputStream.close();
 
             //Add header
             String auth = String.format("Bearer %s", Config.getAuthToken());
             httpURLConnection.setRequestProperty("Authorization", auth);
             httpURLConnection.setRequestProperty("Content-Type", "application/json");
+            httpURLConnection.setDoOutput(true);
+
+            String jsonString = "{\n" +
+                    "  \"orderType\": \"MARKET\",\n" +
+                    "  \"session\": \"NORMAL\",\n" +
+                    "  \"duration\": \"DAY\",\n" +
+                    "  \"orderStrategyType\": \"SINGLE\",\n" +
+                    "  \"orderLegCollection\": [\n" +
+                    "    {\n" +
+                    "      \"instruction\": \"Buy\",\n" +
+                    "      \"quantity\": 1,\n" +
+                    "      \"instrument\": {\n" +
+                    "        \"symbol\": \"MPLX\",\n" +
+                    "        \"assetType\": \"EQUITY\"\n" +
+                    "      }\n" +
+                    "    }\n" +
+                    "  ]\n" +
+                    "}";
+
+            try(OutputStream os = httpURLConnection.getOutputStream()) {
+                byte[] input = jsonString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+
+            String line = "";
+            InputStreamReader inputStreamReader = new InputStreamReader(httpURLConnection.getInputStream());
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            StringBuilder response = new StringBuilder();
+            while((line = bufferedReader.readLine()) != null)
+            {
+                response.append(line);
+            }
+
+            bufferedReader.close();
+
+            String out = response.toString();
+
+            System.out.println(out);
+            return out;
+
+
+        }
+        catch (Exception e)
+        {
+
+        }
+        return null;
+    }
+
+
+    public static String placeOrder(String post_data)
+    {
+        String urlString = "https://api.tdameritrade.com/v1/accounts/" + Config.accountID + "/orders";
+
+        try{
+            URL url = new URL(urlString);
+
+            HttpsURLConnection httpURLConnection = (HttpsURLConnection)url.openConnection();
+            httpURLConnection.setRequestMethod("POST");
+
+            //Add header
+            String auth = String.format("Bearer %s", Config.getAuthToken());
+            httpURLConnection.setRequestProperty("Authorization", auth);
+            httpURLConnection.setRequestProperty("Content-Type", "application/json");
+            httpURLConnection.setDoOutput(true);
+
+            try(OutputStream os = httpURLConnection.getOutputStream()) {
+                byte[] input = post_data.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
 
             String line = "";
             InputStreamReader inputStreamReader = new InputStreamReader(httpURLConnection.getInputStream());
@@ -165,16 +210,11 @@ public class Client
             bufferedReader.close();
 
             return response.toString();
-
-
         }
         catch (Exception e)
         {
-
+            System.out.println("Error Client: placeOrder()");
         }
-
-
-
 
         return null;
     }

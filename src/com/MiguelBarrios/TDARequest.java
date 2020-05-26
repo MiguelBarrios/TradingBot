@@ -6,58 +6,47 @@ import java.util.Arrays;
 
 public class TDARequest
 {
+	//Session
+	public static String NORMAL = "NORMAL";
+	public static String AM = "AM";
+	public static String PM = "PM";
+
+	//Duration
+	public static String DAY = "DAY";
+	public static String GOOD_TILL_CANCEL = "GOOD_TILL_CANCEL";
+	public static String FILL_OR_KILL = "FILL_OR_KILL";
+
+	//OrderType
+	public static String MARKET = "MARKET";
+	public static String LIMIT = "LIMIT";
+
+	//Instruction
+	public static String BUY = "Buy";
+	public static String SELL = "Sell";
+
+	//asset Type
+	public static String EQUITY = "EQUITY";
+
+
 	public static boolean simulation = false;
 
 	public static Trade placeOrder(String symbol, OrderType type, int numShares)
 	{
-		if(type == OrderType.BUY)
-		{
-			Trade trade =  buy(symbol, numShares);
-			Log.saveTrade(trade);
-			return trade;
-		}
-		else if(type == OrderType.SELL)
-		{
-			Trade trade = sell(symbol,numShares);
-			Log.saveTrade(trade);
-			return trade;
+		if(!simulation) {
+			String order = OrderBuilder.marketOrder(type.toString(), symbol, numShares);
+			Client.placeOrder(order);
 		}
 
-		return null;
+		//TODO: find a way to check the price if simulation is off, then everthing below is unnesesary
+		Quote quote = getQuote(symbol);
+
+		double price = (type == OrderType.SELL) ? quote.getBidprice() : quote.getAskPrice();
+		Trade trade= new Trade(type, numShares, price, symbol);
+		Log.saveTrade(trade);
+
+		return trade;
+
 	}
-
-
-	public static Trade buy(String symbol, int numShares)
-	{
-		if(simulation)
-		{
-			Quote quote = getQuote(symbol);
-			return new Trade(OrderType.BUY, numShares, quote.getAskPrice(), symbol);
-		}
-		else
-		{
-			//TODO: execute buy order
-		}
-
-		return null;
-	}
-
-	public static Trade sell(String symbol, int numShares)
-	{
-		if(simulation)
-		{
-			Quote quote = getQuote(symbol);
-			return new Trade(OrderType.SELL, numShares, quote.getBidprice(), symbol);
-		}
-		else
-		{
-			//TODO: EXECUTE SELL ORDER
-		}
-
-		return null;
-	}
-
-
 
 
 	//Complete

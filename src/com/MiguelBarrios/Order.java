@@ -21,7 +21,7 @@ public class Order
     {
         //TODO: MAKE MORE READABLE
         double profit = stats.getCurrentPrice() - stats.getInitialPrice();
-        return String.format("%s: %.3f %.3f",bought.getSymbol(), profit, stats.getPercentChange());
+        return String.format("\n%s: %.3f %.3f",bought.getSymbol(), profit, stats.getPercentChange());
     }
 
     public OrderType update()
@@ -33,6 +33,12 @@ public class Order
     public OrderType update(double price)
     {
         return stats.update(price);
+    }
+
+    public String smsFormat()
+    {
+        double profit = sold.getTotalPrice() - bought.getTotalPrice();
+        return String.format("%s %.2f %.2f %.2f", bought.getSymbol(), bought.getTotalPrice(), sold.getTotalPrice(), profit);
     }
 
     public String[] cvsFormat()
@@ -87,6 +93,5 @@ public class Order
     {
         return stats.getPercentChange();
     }
-
 
 }

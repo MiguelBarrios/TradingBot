@@ -47,6 +47,11 @@ public class Account
         String symbol = quote.getSymbol();
         Double price = quote.getAskPrice();
 
+        //check to see if price is less then the max you are willing to pay for it
+        if(price > maxPrice) {
+            return false;
+        }
+
         //Check to see if we already hold the stock, or have already held the stock
         if(activeOrders.containsKey(symbol) || closedOrders.contains(symbol)) {
             return false;
@@ -55,11 +60,6 @@ public class Account
         //Check to see if we have enough money to complete the initialPurchase, with and increase of 1% to cover market price
         double fundsNeeded = ((1.0 / price) + price) * positionSize;
         if(fundsNeeded > availableFunds) {
-            return false;
-        }
-
-        //check to see if price is less then the max you are willing to pay for it
-        if(price > maxPrice) {
             return false;
         }
 
@@ -91,9 +91,7 @@ public class Account
         for(String key : activeOrders.keySet())
         {
             Order order = activeOrders.get(key);
-            Trade trade = TDARequest.placeOrder(order.getSymbol(), OrderType.SELL, order.positionSize());
-            order.close(trade);
-            totalProfit += order.soldFor();
+            closePosition(order);
         }
     }
 
@@ -105,7 +103,7 @@ public class Account
     }
 
 
-    public void closePosition(Order order)
+    public Order closePosition(Order order)
     {
         Trade trade = TDARequest.placeOrder(order.getSymbol(), OrderType.SELL, order.positionSize());
         order.close(trade);
@@ -113,6 +111,8 @@ public class Account
         activeOrders.remove(order.getSymbol());
         closedOrders.add(order.getSymbol());
         totalProfit += order.soldFor();
+
+        return order;
     }
 
     public double availableFunds()
