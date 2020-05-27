@@ -76,7 +76,7 @@ public class Account
         return true;
     }
 
-    public boolean initialPurchase(String symbol)
+    public Trade initialPurchase(String symbol)
     {
 
         Trade trade = TDARequest.placeOrder(symbol, OrderType.BUY,positionSize);
@@ -86,8 +86,7 @@ public class Account
         activeOrders.put(symbol, order);
         availableFunds -= order.boughtFor();
 
-        System.out.println(trade);
-        return true;
+        return trade;
 
     }
 
@@ -108,11 +107,10 @@ public class Account
 
     }
 
-    public void printSummary()
+    public String getSummary()
     {
-        System.out.println("Account Summary");
-        System.out.println("Remaining funds: " + availableFunds);
-        System.out.println("Todays Profits: " + ((totalProfit + availableFunds) - startingFunds));
+        double profit = ((totalProfit + availableFunds) - startingFunds);
+        return String.format("Account Summary\nProfits: %+.2f", profit);
     }
 
 

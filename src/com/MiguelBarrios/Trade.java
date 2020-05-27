@@ -29,6 +29,11 @@ public class Trade
 
     public static final DecimalFormat format = new DecimalFormat("####.###");
 
+    public String smsFormat()
+    {
+        return String.format("%s %d %s %.2f", orderType, numberOfShares, symbol, totalPrice);
+    }
+
     public String[] cvsFormat()
     {
         String[] arr = {
@@ -88,16 +93,6 @@ public class Trade
     public String toString()
     {
         return String.format("%4s %d %4s %+3.3f %+3.3f %s", orderType, numberOfShares, symbol, price, totalPrice, time);
-
-        /*
-        return  orderType +
-                " " +numberOfShares +
-                " " + symbol  +
-                " price = " + price +
-                ", totalPrice = " + totalPrice +
-                ", time = " + time;
-
-                */
     }
 
 }
