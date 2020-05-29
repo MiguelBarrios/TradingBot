@@ -2,29 +2,59 @@ package com.MiguelBarrios;
 
 public class Quote
 {
-    private String symbol;
+    public final String symbol;
 
-    private double bidprice;
+    public final  double bidprice;
 
-    private int bidSize;
+    public final int bidSize;
 
-    private double askPrice;
+    public final double askPrice;
 
-    private int askSize;
+    public final int askSize;
 
-    private double netChange;
+    public final double netChange;
 
-    private boolean shortable;
+    public final boolean shortable;
 
-    public Quote(String name, double bidprice, int bidSize, double askPrice, int askSize, double netChange, boolean shortable)
+    public final int totalVolume;
+
+    public final double volitility;
+
+    public final double regularMarketNetChange;
+
+    public final long time;
+
+    public Quote(String symbol, double bidprice, int bidSize, double askPrice, int askSize, double netChange, int totalVolume, boolean shortable, double volitility, double regularMarketNetChange)
     {
-        this.symbol = name;
+        this.symbol = symbol;
         this.bidprice = bidprice;
         this.bidSize = bidSize;
         this.askPrice = askPrice;
         this.askSize = askSize;
         this.netChange = netChange;
+        this.totalVolume = totalVolume;
         this.shortable = shortable;
+        this.volitility = volitility;
+        this.regularMarketNetChange = regularMarketNetChange;
+        this.time = System.currentTimeMillis();
+    }
+
+    public String[] csvFormat()
+    {
+        String[] arr = {symbol,
+                String.valueOf(bidprice),
+                String.valueOf(bidSize),
+                String.valueOf(askPrice),
+                String.valueOf(askSize),
+                String.valueOf(netChange),
+                String.valueOf(totalVolume),
+                String.valueOf(shortable),
+                String.valueOf(volitility),
+                String.valueOf(regularMarketNetChange),
+                String.valueOf(time)
+        };
+
+        return arr;
     }
 
 
@@ -39,40 +69,5 @@ public class Quote
                 ", askSize=" + askSize +
                 ", netChange=" + netChange +
                 ", shortable=" + shortable;
-    }
-
-    public String getSymbol()
-    {
-        return symbol;
-    }
-
-    public double getBidprice()
-    {
-        return bidprice;
-    }
-
-    public int getBidSize()
-    {
-        return bidSize;
-    }
-
-    public double getAskPrice()
-    {
-        return askPrice;
-    }
-
-    public int getAskSize()
-    {
-        return askSize;
-    }
-
-    public double getNetChange()
-    {
-        return netChange;
-    }
-
-    public boolean isShortable()
-    {
-        return shortable;
     }
 }

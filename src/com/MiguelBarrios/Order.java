@@ -1,7 +1,5 @@
 package com.MiguelBarrios;
 
-import jdk.swing.interop.SwingInterOpUtils;
-
 public class Order
 {
      private Trade bought;
@@ -19,26 +17,12 @@ public class Order
 
     public String status()
     {
-        //TODO: MAKE MORE READABLE
-        return String.format("%4s: %+.3f",bought.getSymbol(), stats.getPercentChange());
+        return String.format("%4s: %+.4f",bought.getSymbol(), stats.getPercentChange());
     }
 
     public boolean change()
     {
-        if(stats.getPercentChange() >= 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    public OrderType update()
-    {
-        Quote quote = TDARequest.getQuote(bought.getSymbol());
-        return stats.update(quote.getAskPrice());
+        return stats.getPercentChange() >= 0;
     }
 
     public OrderType update(double price)
@@ -46,15 +30,9 @@ public class Order
         return stats.update(price);
     }
 
-    public String smsFormat()
-    {
-        double profit = sold.getTotalPrice() - bought.getTotalPrice();
-        return String.format("%s %.2f %.2f %.2f", bought.getSymbol(), bought.getTotalPrice(), sold.getTotalPrice(), profit);
-    }
-
     public String[] cvsFormat()
     {
-        if(bought.getSymbol() != sold.getSymbol())
+        if(!bought.getSymbol().equalsIgnoreCase(sold.getSymbol()))
         {
             System.out.println("ERROR in Orders modual:\nMISSMATCHED trades ");
             System.out.println(bought);
@@ -98,15 +76,6 @@ public class Order
     public double soldFor()
     {
         return sold.getTotalPrice();
-    }
-
-    public double getPercentChange()
-    {
-        return stats.getPercentChange();
-    }
-    public double currentPrice()
-    {
-        return stats.getCurrentPrice();
     }
 
 }

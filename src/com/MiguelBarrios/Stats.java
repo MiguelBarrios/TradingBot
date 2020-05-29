@@ -2,9 +2,17 @@ package com.MiguelBarrios;
 
 public class Stats
 {
-    private static double DEFAULT_FACTOR = 0.02;
+    private static final double DEFAULT_FACTOR = 0.02;
 
-    private double initialPrice;
+    private static final double INITIAL_PRICE_FACTOR = 0.015;
+
+    private final double initialPrice;
+
+    private final boolean shortPosition;
+
+    private final double sellPriceInit;
+
+    private final double factor;
 
     private double currentPrice;
 
@@ -14,11 +22,7 @@ public class Stats
 
     private double percentChange;
 
-    private boolean shortPosition;
-
     private double sellPrice;
-
-    private double factor;
 
     public Stats(double initialPrice, OrderType type)
     {
@@ -27,29 +31,18 @@ public class Stats
 
     public Stats(double initialPrice, OrderType type, double factor)
     {
-        this.initialPrice = initialPrice;
+        this.initialPrice = this.currentPrice =  absoluteMax = absoluteMin = initialPrice;
 
-        currentPrice = initialPrice;
-
-        absoluteMax = initialPrice;
-
-        absoluteMin = initialPrice;
+        this.factor = factor;
 
         percentChange = 0;
 
+        shortPosition = (type == OrderType.SHORT);
 
-        shortPosition = (type == OrderType.SHORT) ? true : false;
+        int isShort = (shortPosition) ? 1 : -1;
 
-        if(shortPosition)
-        {
-            sellPrice = absoluteMin  + (absoluteMin * factor);
-        }
-        else
-        {
-            sellPrice = absoluteMax - (absoluteMax * factor);
-        }
-
-        this.factor = factor;
+        sellPrice = absoluteMin  + (absoluteMin * factor * isShort);
+        sellPriceInit = initialPrice + (initialPrice * INITIAL_PRICE_FACTOR * isShort);
     }
 
     public OrderType update(double price)
@@ -64,7 +57,7 @@ public class Stats
             absoluteMin = currentPrice;
         }
 
-        percentChange =  Math.round((1 - initialPrice/currentPrice) * 1000) / 1000.0;
+        percentChange =  Math.round((1 - initialPrice/currentPrice) * 10000) / 10000.0;
 
         if(shortPosition)
         {
@@ -75,13 +68,12 @@ public class Stats
         else
         {
             sellPrice = absoluteMax - (absoluteMax * factor);
-            if(currentPrice <= sellPrice)
+            if(currentPrice <= sellPrice || currentPrice < sellPriceInit)
                 return OrderType.SELL;
         }
 
         return OrderType.HOLD;
     }
-
 
     public double getPercentChange()
     {

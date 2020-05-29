@@ -34,15 +34,13 @@ public class TDARequest
 	{
 		if(!simulation) {
 			String order = OrderBuilder.marketOrder(type.toString(), symbol, numShares);
-			String response = Client.placeOrder(order);
-
-			System.out.println(response);
+			Client.placeOrder(order);
 		}
 
 		//TODO: find a way to check the price if simulation is off, then everthing below is unnesesary
 		Quote quote = getQuote(symbol);
 
-		double price = (type == OrderType.SELL) ? quote.getBidprice() : quote.getAskPrice();
+		double price = (type == OrderType.SELL) ? quote.bidprice : quote.askPrice;
 		Trade trade= new Trade(type, numShares, price, symbol);
 		Log.saveTrade(trade);
 

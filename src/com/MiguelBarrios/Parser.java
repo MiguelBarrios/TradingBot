@@ -3,7 +3,6 @@ package com.MiguelBarrios;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,15 +12,11 @@ public class Parser
 {
     public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-    public static SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    //String formattedTime = output.format(d);
-
     public static String parsAuthToken(String responseString)
     {
         try{
             JSONObject json = new JSONObject(responseString);
-            String token = json.get("access_token").toString();
-            return token;
+            return json.get("access_token").toString();
         }
         catch (Exception e)
         {
@@ -64,7 +59,6 @@ public class Parser
 
     public static String[] parseMovers(String response)
     {
-
         JSONArray arr = new JSONArray(response);
         String[] symbols = new String[arr.length()];
 
@@ -75,7 +69,6 @@ public class Parser
             String symbol = object.getString("symbol");
             symbols[i] = symbol;
         }
-
 
         return symbols;
     }
@@ -90,9 +83,12 @@ public class Parser
             double askPrice = obj.getDouble("askPrice");
             int askSize = obj.getInt("askSize");
             double netChange = obj.getDouble("netChange");
+            int totalVolume = obj.getInt("totalVolume");
             boolean shortable = obj.getBoolean("shortable");
+            double volitility = obj.getDouble("volatility");
+            double regularMarketNetChange = obj.getDouble("regularMarketNetChange");
 
-            return new Quote(symbol, bidprice, bidSize, askPrice, askSize, netChange, shortable);
+            return new Quote(symbol, bidprice, bidSize, askPrice, askSize, netChange, totalVolume, shortable, volitility, regularMarketNetChange);
         }
         catch (Exception e)
         {
@@ -107,9 +103,7 @@ public class Parser
         if(stocks.size() == 0)
             return new ArrayList<>();
 
-
         ArrayList<Quote> quotes = new ArrayList<>(stocks.size());
-
 
         for(String symbol : stocks)
         {
@@ -121,9 +115,12 @@ public class Parser
                 double askPrice = obj.getDouble("askPrice");
                 int askSize = obj.getInt("askSize");
                 double netChange = obj.getDouble("netChange");
+                int totalVolume = obj.getInt("totalVolume");
                 boolean shortable = obj.getBoolean("shortable");
+                double volitility = obj.getDouble("volatility");
+                double regularMarketNetChange = obj.getDouble("regularMarketNetChange");
 
-                Quote quote = new Quote(symbol, bidprice, bidSize, askPrice, askSize, netChange, shortable);
+                Quote quote = new Quote(symbol, bidprice, bidSize, askPrice, askSize, netChange, totalVolume, shortable, volitility, regularMarketNetChange);
                 quotes.add(quote);
             }
             catch(Exception e)
