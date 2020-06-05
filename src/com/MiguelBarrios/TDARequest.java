@@ -150,15 +150,15 @@ public class TDARequest
 
 	//Need to update refresh token july 24
 	//Complete
-	public static String refreshAuthToken()
+	public static void refreshAuthToken()
 	{
 		String urlString = "https://api.tdameritrade.com/v1/oauth2/token";
 		String post_data = "grant_type=refresh_token&refresh_token=" + Config.refreshToknn + "&access_type=&code=&client_id=" + Config.apiKey + "&redirect_uri=";
 
 		String response = Client.sendRequestPost(urlString, post_data);
 
-		String out = Parser.parsAuthToken(response);
-		return out;
+		String authToken = Parser.parsAuthToken(response);
+		Config.updateAuthToken(authToken);
 	}
 
 	public static void placeOrder()

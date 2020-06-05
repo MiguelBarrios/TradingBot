@@ -28,7 +28,6 @@ public class Parser
 
     public static Market parseMarketHours(String responseString)
     {
-
         try{
             JSONObject json = new JSONObject(responseString);
 
@@ -73,10 +72,9 @@ public class Parser
         return symbols;
     }
 
-    public static Quote parseQuote(String quoteString, String symbol)
+    public static Quote parseQuote(JSONObject response, String symbol)
     {
         try{
-            JSONObject response = new JSONObject(quoteString);
             JSONObject obj = response.getJSONObject(symbol);
             double bidprice = obj.getDouble("bidPrice");
             int bidSize = obj.getInt("bidSize");
@@ -105,28 +103,17 @@ public class Parser
 
         ArrayList<Quote> quotes = new ArrayList<>(stocks.size());
 
-        for(String symbol : stocks)
-        {
-            try{
-                JSONObject response = new JSONObject(quotesString);
-                JSONObject obj = response.getJSONObject(symbol);
-                double bidprice = obj.getDouble("bidPrice");
-                int bidSize = obj.getInt("bidSize");
-                double askPrice = obj.getDouble("askPrice");
-                int askSize = obj.getInt("askSize");
-                double netChange = obj.getDouble("netChange");
-                int totalVolume = obj.getInt("totalVolume");
-                boolean shortable = obj.getBoolean("shortable");
-                double volitility = obj.getDouble("volatility");
-                double regularMarketNetChange = obj.getDouble("regularMarketNetChange");
-
-                Quote quote = new Quote(symbol, bidprice, bidSize, askPrice, askSize, netChange, totalVolume, shortable, volitility, regularMarketNetChange);
+        try{
+            JSONObject response = new JSONObject(quotesString);
+            for(String symbol : stocks)
+            {
+                Quote quote = parseQuote(response, symbol);
                 quotes.add(quote);
             }
-            catch(Exception e)
-            {
-                //do nothing, sometimes request fails to get all values
-            }
+        }
+        catch(Exception e)
+        {
+            //do nothing, sometimes request fails to get all values
         }
 
         return quotes;

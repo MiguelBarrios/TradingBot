@@ -1,37 +1,26 @@
 package com.MiguelBarrios;
-
 import com.twilio.Twilio;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
 import com.twilio.rest.api.v2010.account.Message;
 
 public class Main
 {
-    public static final String RED = "\033[0;31m";     // RED
-    public static final String GREEN = "\033[0;32m";   // GREEN
-    public static final String RESET = "\033[0m";      // Text Reset
-
     public static void main(String[] args)
     {
         Twilio.init(Config.ACCOUNT_SID, Config.AUTH_TOKEN);
         Account account = new Account(100000,0, 2000, 1, true);
 
         //Get authentication token
-        String authToken = TDARequest.refreshAuthToken();
-        Config.updateAuthToken(authToken);
+        TDARequest.refreshAuthToken();
 
         //All stocks previously encountered
         //For this trial a stock will only be purchased once
         HashSet<String> previouslyEncountered = new HashSet<>();
         Market market = TDARequest.marketHours();
-        if(market == null) {
-            System.out.println("Market is closed");
-            System.exit(0);
-        }
 
         long startTime = System.currentTimeMillis();
-        while(market.isOpen(false, false)) {
+        while(market != null && market.isOpen(false, false)) {
             ArrayList<String> trendingUp = new ArrayList<>(20);
 
             //get symbols that we have not see before
@@ -57,48 +46,39 @@ public class Main
                 }
             }
 
-            for(int j = 0; j < 5; ++j) {
-                if(account.numberActivePosition() != 0){
-                    ArrayList<Quote> quotes =  account.getActivePositionsQuotes();
+            for(int j = 0; j < 5 && (account.numberActivePosition() != 0); ++j) {
+                ArrayList<Quote> quotes =  account.getActivePositionsQuotes();
+                for (Quote quote :  quotes) {
+                    Order order = account.getOrder(quote.symbol);
+                    OrderType recommendation = order.update(quote.bidprice);
 
-                    for (Quote quote :  quotes) {
-                        Order order = account.getOrder(quote.symbol);
-                        OrderType recommendation = order.update(quote.bidprice);
+                    String color = (order.change()) ? Color.GREEN : Color.RED;
+                    System.out.print(color + order.status() + ",");
 
-                        String color = (order.change()) ? GREEN : RED;
-                        System.out.print(color + order.status() + ",");
-
-                        if (recommendation == OrderType.SELL) {
-                            account.closePosition(order);
-                        }
+                    if (recommendation == OrderType.SELL) {
+                        account.closePosition(order);
                     }
-                    System.out.println(RESET);
-                    pause(1);
                 }
-                else{
-                    pause(10);
-                    break;
-                }
+                System.out.println(Color.RESET);
+                pause(1);
             }
 
             //Check to see if we need to refresh auth Token
-            long timePassed = System.currentTimeMillis() - startTime;
-            if(timePassed > 1500000) {
+            if((System.currentTimeMillis() - startTime) > 1500000) {
                 startTime = System.currentTimeMillis();
-                Config.updateAuthToken(TDARequest.refreshAuthToken());
+                TDARequest.refreshAuthToken();
             }
         }
 
-        System.out.println("Closing all open Positions");
-        //TODO: works figure out how to do it with iterator, without getting concurrent modification exception
-        ArrayList<Quote> quotes =  account.getActivePositionsQuotes();
-        for(Quote quote : quotes) {
-            Order order = account.getOrder(quote.symbol);
-            account.closePosition(order);
+        //Close all open position
+        if(account.numberActivePosition() > 0)
+        {
+            ArrayList<Quote> quotes =  account.getActivePositionsQuotes();
+            for(Quote quote : quotes) {
+                Order order = account.getOrder(quote.symbol);
+                account.closePosition(order);
+            }
         }
-
-        String summary = account.getSummary();
-        sendSMS(summary);
     }
 
     public static void pause(long time) {
@@ -119,8 +99,7 @@ public class Main
                     sms) //Message
                     .create();
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             //do nothing
         }
     }

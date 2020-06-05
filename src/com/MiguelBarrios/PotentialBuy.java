@@ -10,11 +10,14 @@ public class PotentialBuy
 
     private double currentPrice;
 
+    private double buyPrice;// = initialPrice + (initialPrice * INITIAL_PRICE_FACTOR * isShort);
+
     public PotentialBuy(String symbol, double initialPrice)
     {
         this.symbol = symbol;
         this.initialPrice = initialPrice;
         currentPrice = initialPrice;
+
     }
 
     
