@@ -7,7 +7,7 @@ public class Main
     public static void main(String[] args)
     {
         Market market = TDARequest.marketHours();
-        /*
+
         while(market == null) {
             System.out.println("Waiting for market to open");
             Util.pause(300);
@@ -19,8 +19,6 @@ public class Main
             Util.pause(60);
         }
 
-         */
-
 
         //Get authentication token
         TDARequest.refreshAuthToken();
@@ -28,13 +26,6 @@ public class Main
 
         TradingStrategy topMovers = new TopMovers(10000,0,300,1,true);
 
-        topMovers.cycle();
-
-        topMovers.cycle();
-
-        topMovers.closeAllPositions();
-
-        /*
         while(market.isOpen(false, false)) {
 
             topMovers.cycle();
@@ -45,11 +36,10 @@ public class Main
                 TDARequest.refreshAuthToken();
             }
         }
-        */
 
 
         //Close all open position
-        //topMovers.closeAllPositions();
+        topMovers.closeAllPositions();
     }
 
 

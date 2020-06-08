@@ -16,8 +16,6 @@ import java.net.URL;
 import java.net.HttpURLConnection;
 
 
-
-
 public class Client
 {
     private static HttpClient client = HttpClient.newHttpClient();

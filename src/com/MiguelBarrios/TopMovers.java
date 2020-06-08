@@ -6,7 +6,6 @@ public class TopMovers extends TradingStrategy
 {
     private Trader trader;
 
-
     public TopMovers(double initial_funds, double min_price, double max_price, int position_size, boolean simulation) {
         this.trader = new Trader(initial_funds,min_price,max_price,position_size,simulation,"TopMovers" ,Strategy.TOPMOVERS);
     }

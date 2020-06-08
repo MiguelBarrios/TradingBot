@@ -85,10 +85,11 @@ public class TDARequest
 		//String response = Client.sendRequestGet(urlString);
 		ArrayList<String> cur = new ArrayList<>(1);
 		cur.add(symbol);
+
+		if(cur.size() == 0)
+			return null;
+
 		return getQuotes(cur).get(0);
-
-
-		//return Parser.parseQuote(response, symbol);
 	}
 
 	//Complete
