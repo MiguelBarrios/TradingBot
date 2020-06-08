@@ -1,10 +1,11 @@
 package com.MiguelBarrios;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Trader
 {
-    private HashMap<String, Order> activePositions = new HashMap<>();
+    private ConcurrentHashMap<String, Order> activePositions;
 
     private HashSet<String> closedPositions = new HashSet<>();
 
@@ -22,7 +23,11 @@ public class Trader
 
     public boolean simulation;
 
-    public Trader(double initial_funds, double min_price, double max_price, int position_size, boolean simulation)
+    private Log log;
+
+    private final Strategy strategy;
+
+    public Trader(double initial_funds, double min_price, double max_price, int position_size, boolean simulation, String directory, Strategy strategy)
     {
         this.initial_funds = initial_funds;
         this.remaining_funds = initial_funds;
@@ -30,10 +35,14 @@ public class Trader
         this.max_price = max_price;
         this.position_size = position_size;
         this.simulation = simulation;
+        this.strategy = strategy;
 
-        activePositions = new HashMap<>();
+        activePositions = new ConcurrentHashMap<>();
         closedPositions = new HashSet<>();
         previouslyEncountered = new HashSet<>();
+
+        this.log = new Log(directory);
+
     }
 
     public Order getOrder(String symbol)
@@ -72,7 +81,8 @@ public class Trader
     public void closePosition(Order order)
     {
         Trade trade = TDARequest.placeOrder(order.getSymbol(), OrderType.SELL, order.positionSize());
-        order.close(trade);
+        Order completedOrder = order.close(trade);
+        log.saveOrder(completedOrder);
         activePositions.remove(order.getSymbol());
         closedPositions.add(order.getSymbol());
     }
@@ -82,17 +92,26 @@ public class Trader
         if(activePositions.size() == 0)
             return;
 
+
         for (Order cur : activePositions.values())
         {
             closePosition(cur);
         }
+
 
     }
 
     public void buyPosition(String symbol)
     {
         Trade trade = TDARequest.placeOrder(symbol, OrderType.BUY,position_size);
-        Order order = new Order(trade);
+        Order order = null;
+        if(strategy == Strategy.TOPMOVERS){
+            order = new Order(trade, new TopMoversStats(trade));
+        }
+        else if(strategy == Strategy.STOCKFOLLOWER){
+
+        }
+
 
         //add order to currently held orders
         activePositions.put(symbol, order);

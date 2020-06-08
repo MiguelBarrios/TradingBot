@@ -46,7 +46,6 @@ public class TDARequest
 
 		double price = (type == OrderType.SELL) ? quote.bidprice : quote.askPrice;
 		Trade trade= new Trade(type, numShares, price, symbol);
-		Log.saveTrade(trade);
 
 		return trade;
 
@@ -82,9 +81,14 @@ public class TDARequest
 	//Complete
 	public static Quote getQuote(String symbol)
 	{
-		String urlString = String.format("https://api.tdameritrade.com/v1/marketdata/%s/quotes", symbol);
-		String response = Client.sendRequestGet(urlString);
-		return Parser.parseQuote(response, symbol);
+		//String urlString = String.format("https://api.tdameritrade.com/v1/marketdata/%s/quotes", symbol);
+		//String response = Client.sendRequestGet(urlString);
+		ArrayList<String> cur = new ArrayList<>(1);
+		cur.add(symbol);
+		return getQuotes(cur).get(0);
+
+
+		//return Parser.parseQuote(response, symbol);
 	}
 
 	//Complete

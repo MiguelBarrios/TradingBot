@@ -1,7 +1,5 @@
 package com.MiguelBarrios;
-
 import com.opencsv.CSVWriter;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,23 +14,23 @@ public class Log
     public static final SimpleDateFormat yearMonthDay = new SimpleDateFormat("yyyy-MM-dd");
     private static final String mainDirectory = "/Users/miguelbarrios/Documents/Projects/Logs/";
 
-    private static File quotesFile;
-    private static File tradesFile;
-    private static File ordersFile;
+    private File quotesFile;
+    private File tradesFile;
+    private File ordersFile;
 
-    public Log()
+    public Log(String directory)
     {
         //Initilize files and directories
-        tradesFile =  mkdir("Trades");
+        tradesFile =  mkdir(directory + "/Trades");
         String[] tradesHeader = {"Trade Type", "Symbol", "amount", "Idv Price", "Total  Price", "TOE"};
         addHeader(tradesFile, tradesHeader);
 
 
-        ordersFile = mkdir("Orders");
+        ordersFile = mkdir(directory + "/Orders");
         String[] orderHeader = {"Symbol", "Bought Price", "Sold Price","Profit", "Change", "Max", "Min"};
         addHeader(ordersFile, orderHeader);
 
-        quotesFile = mkdir("Quotes");
+        quotesFile = mkdir(directory + "/Quotes");
         String[] quotesHeader = {"SYMBOL", "BID_PRICE", "BID_SIZE", "ASK_PRICE", "ASK_SIZE", "NET_CHANGE", "VOLUME", "SHORTABLE", "VOLITILITY", "CHANGE", "TIME"};
         addHeader(quotesFile, quotesHeader);
 
@@ -70,12 +68,11 @@ public class Log
 
     }
 
-    public static void saveOrder(Order order)
+    public void saveOrder(Order order)
     {
         try{
             FileWriter outputfile = new FileWriter(ordersFile, true);
             CSVWriter writer = new CSVWriter(outputfile);
-
             writer.writeNext(order.cvsFormat());
 
             writer.close();
@@ -85,7 +82,7 @@ public class Log
         }
     }
 
-    public static void saveTrade(Trade trade)
+    public void saveTrade(Trade trade)
     {
         try{
             FileWriter outputfile = new FileWriter(tradesFile, true);
@@ -100,7 +97,7 @@ public class Log
         }
     }
 
-    public static void saveQuotes(ArrayList<Quote> quotes)
+    public void saveQuotes(ArrayList<Quote> quotes)
     {
         try
         {

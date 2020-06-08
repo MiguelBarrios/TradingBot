@@ -6,8 +6,9 @@ public class TopMovers extends TradingStrategy
 {
     private Trader trader;
 
+
     public TopMovers(double initial_funds, double min_price, double max_price, int position_size, boolean simulation) {
-        this.trader = new Trader(initial_funds,min_price,max_price,position_size,simulation);
+        this.trader = new Trader(initial_funds,min_price,max_price,position_size,simulation,"TopMovers" ,Strategy.TOPMOVERS);
     }
 
     @Override
@@ -39,12 +40,35 @@ public class TopMovers extends TradingStrategy
             }
         }
 
-        trader.update_open_positions();
+        update_open_positions();
     }
 
     @Override
     public void closeAllPositions()
     {
         trader.closeAllOpenPositions();
+    }
+
+    @Override
+    public void update()
+    {
+
+    }
+
+    public void update_open_positions()
+    {
+        ArrayList<Quote> quotes =  trader.getActivePositionsQuotes();
+        for (Quote quote :  quotes) {
+            Order order = trader.getOrder(quote.symbol);
+            OrderType recommendation = order.update(quote.bidprice);
+
+            String color = (order.change()) ? Color.GREEN : Color.RED;
+            System.out.print(color + order.status() + ",");
+
+            if (recommendation == OrderType.SELL) {
+                trader.closePosition(order);
+            }
+        }
+        System.out.println(Color.RESET);
     }
 }

@@ -6,12 +6,12 @@ public class Order
 
      private Trade sold;
 
-     private Stats stats;
+     private Statistics stats;
 
-    public Order(Trade bought)
+    public Order(Trade bought, Statistics stats)
     {
         this.bought = bought;
-        this.stats = new Stats(bought.getPrice(), bought.getOrderType());
+        this.stats = stats;
         sold = null;
     }
 
@@ -52,10 +52,10 @@ public class Order
         return arr;
     }
 
-    public void close(Trade trade)
+    public Order close(Trade trade)
     {
         this.sold = trade;
-        Log.saveOrder(this);
+        return this;
     }
 
     public String getSymbol()
