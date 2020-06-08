@@ -42,7 +42,6 @@ public class Account
         //initialize all logs for today
         Log log = new Log();
 
-        TDARequest.simulation = simulation;
     }
 
 

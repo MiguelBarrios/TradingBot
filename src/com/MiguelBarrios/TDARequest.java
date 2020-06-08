@@ -27,8 +27,12 @@ public class TDARequest
 	//asset Type
 	public static String EQUITY = "EQUITY";
 
+	private static boolean simulation = true;
 
-	public static boolean simulation = true;
+	public static void setSimulation(boolean simulation)
+	{
+		TDARequest.simulation = simulation;
+	}
 
 	public static Trade placeOrder(String symbol, OrderType type, int numShares)
 	{
@@ -161,9 +165,14 @@ public class TDARequest
 		Config.updateAuthToken(authToken);
 	}
 
-	public static void placeOrder()
+	public static void turnOffSimulation()
 	{
+		simulation = false;
+	}
 
+	public static void turn_on_simulation()
+	{
+		simulation = true;
 	}
 }
 
