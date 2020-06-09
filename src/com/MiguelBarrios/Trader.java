@@ -5,27 +5,27 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Trader
 {
+    private final Strategy strategy;
+
+    public final double initial_funds;
+
+    public final double min_price;
+
+    public final double max_price;
+
+    public final int position_size;
+
+    public final boolean simulation;
+
     private ConcurrentHashMap<String, Order> activePositions;
 
     private HashSet<String> closedPositions = new HashSet<>();
 
     private HashSet<String> previouslyEncountered = new HashSet<>();
 
-    public double initial_funds;
-
     public double remaining_funds;
 
-    public double min_price;
-
-    public double max_price;
-
-    public int position_size;
-
-    public boolean simulation;
-
     private Log log;
-
-    private final Strategy strategy;
 
     public Trader(double initial_funds, double min_price, double max_price, int position_size, boolean simulation, String directory, Strategy strategy)
     {
@@ -77,6 +77,7 @@ public class Trader
         }
         System.out.println(Color.RESET);
     }
+    
 
     public void closePosition(Order order)
     {

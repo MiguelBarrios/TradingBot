@@ -10,7 +10,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 .idea/
-.META-INF/
+META-INF/
 
 # Package Files #
 *.jar
