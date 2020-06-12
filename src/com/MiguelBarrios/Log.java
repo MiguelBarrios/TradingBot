@@ -25,7 +25,6 @@ public class Log
         String[] tradesHeader = {"Trade Type", "Symbol", "amount", "Idv Price", "Total  Price", "TOE"};
         addHeader(tradesFile, tradesHeader);
 
-
         ordersFile = mkdir(directory + "/Orders");
         String[] orderHeader = {"Symbol", "Price Bought", "Price Sold","Profit", "Change", "Max", "Min", "Time Bought", "Time Sold"};
         addHeader(ordersFile, orderHeader);
@@ -33,7 +32,6 @@ public class Log
         quotesFile = mkdir(directory + "/Quotes");
         String[] quotesHeader = {"SYMBOL", "BID_PRICE", "BID_SIZE", "ASK_PRICE", "ASK_SIZE", "NET_CHANGE", "VOLUME", "SHORTABLE", "VOLITILITY", "CHANGE", "TIME"};
         addHeader(quotesFile, quotesHeader);
-
     }
 
     private File mkdir(String directory)
@@ -45,21 +43,17 @@ public class Log
         (new File(directoryPath)).mkdirs();
 
         return new File(directoryPath + "/" + yearMonthDay.format(cur) + ".csv");
-
     }
 
     public static void addHeader(File file, String[] header)
     {
-
         try{
             // Ad header to Trades File
             FileWriter outputfile = new FileWriter(file);
             CSVWriter writer = new CSVWriter(outputfile);
 
             writer.writeNext(header);
-
             writer.close();
-
         }
         catch (Exception e)
         {
@@ -74,9 +68,7 @@ public class Log
             FileWriter outputfile = new FileWriter(ordersFile, true);
             CSVWriter writer = new CSVWriter(outputfile);
             writer.writeNext(order.cvsFormat());
-
             writer.close();
-
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -89,7 +81,6 @@ public class Log
             CSVWriter writer = new CSVWriter(outputfile);
 
             writer.writeNext(trade.cvsFormat());
-
             writer.close();
 
         }catch (IOException e){
@@ -99,20 +90,17 @@ public class Log
 
     public void saveQuotes(ArrayList<Quote> quotes)
     {
-        try
-        {
+        try {
             FileWriter outputFile = new FileWriter(quotesFile, true);
             CSVWriter writer = new CSVWriter(outputFile);
 
-            for(Quote quote : quotes)
-            {
+            for(Quote quote : quotes) {
                 writer.writeNext(quote.csvFormat());
             }
 
             writer.close();
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             //DO NOTHING
         }
 

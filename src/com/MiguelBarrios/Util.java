@@ -3,6 +3,8 @@ package com.MiguelBarrios;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -28,5 +30,20 @@ public class Util
         }
 
         return symbols;
+    }
+
+
+    private static String decode(String url)
+    {
+        try
+        {
+            String decode = URLDecoder.decode(url, "UTF-8");
+            return decode;
+        } catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

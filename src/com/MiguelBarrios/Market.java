@@ -49,11 +49,10 @@ public class Market
     {
         Date cur = new Date(System.currentTimeMillis());
 
+        // +1 to ofset timezone
         cur.setHours(cur.getHours() + 1);
 
-        //Sets time ahead 5 minuts becuase we
-        //Dont want to trade in after hours due to decrease liquidity
-        cur.setMinutes(cur.getMinutes() + 10);
+        cur.setMinutes(cur.getMinutes());
 
         //TODO: simplify logic
         if(!pre && !afterHours)

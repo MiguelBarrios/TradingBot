@@ -8,9 +8,6 @@ public class Main
     public static void main(String[] args) throws IOException
     {
 
-
-
-
         Market market = TDARequest.marketHours();
 
         while(market == null) {
@@ -44,9 +41,6 @@ public class Main
             }
         }
 
-
-        //Close all open position
-        topMovers.closeAllPositions();
     }
 
 

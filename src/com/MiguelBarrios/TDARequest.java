@@ -1,32 +1,10 @@
 package com.MiguelBarrios;
-
+import org.json.JSONObject;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class TDARequest
 {
-	//Session
-	public static String NORMAL = "NORMAL";
-	public static String AM = "AM";
-	public static String PM = "PM";
-
-	//Duration
-	public static String DAY = "DAY";
-	public static String GOOD_TILL_CANCEL = "GOOD_TILL_CANCEL";
-	public static String FILL_OR_KILL = "FILL_OR_KILL";
-
-	//OrderType
-	public static String MARKET = "MARKET";
-	public static String LIMIT = "LIMIT";
-
-	//Instruction
-	public static String BUY = "Buy";
-	public static String SELL = "Sell";
-
-	//asset Type
-	public static String EQUITY = "EQUITY";
-
 	private static boolean simulation = true;
 
 	public static void setSimulation(boolean simulation)
@@ -38,21 +16,20 @@ public class TDARequest
 	{
 		if(!simulation) {
 			String order = OrderBuilder.marketOrder(type.toString(), symbol, numShares);
-			Client.placeOrder(order);
+			String response =  Client.placeOrder(order);
+			System.out.println(response);
 		}
 
 		//TODO: find a way to check the price if simulation is off, then everthing below is unnesesary
 		Quote quote = getQuote(symbol);
+		if(quote != null) {
+			double price = (type == OrderType.SELL) ? quote.bidprice : quote.askPrice;
+			return new Trade(type, numShares, price, symbol);
+		}
 
-		double price = (type == OrderType.SELL) ? quote.bidprice : quote.askPrice;
-		Trade trade= new Trade(type, numShares, price, symbol);
-
-		return trade;
-
+		return null;
 	}
 
-
-	//Complete
 	public static Market marketHours()
 	{
 		int month = ZonedDateTime.now().getDayOfMonth();
@@ -64,55 +41,44 @@ public class TDARequest
 
 		String response = Client.sendRequest(request);
 
-		Market hours = Parser.parseMarketHours(response);
-
-		return hours;
-
+		return Parser.parseMarketHours(response);
 	}
 
-	//Complete
 	public static String getAccountInfo()
 	{
 		String urlString = String.format("https://api.tdameritrade.com/v1/accounts/%s", Config.accountID);
-
 		return Client.sendRequestGet(urlString);
 	}
 
-	//Complete
 	public static Quote getQuote(String symbol)
 	{
-		//String urlString = String.format("https://api.tdameritrade.com/v1/marketdata/%s/quotes", symbol);
-		//String response = Client.sendRequestGet(urlString);
-		ArrayList<String> cur = new ArrayList<>(1);
-		cur.add(symbol);
+		String urlString = String.format("https://api.tdameritrade.com/v1/marketdata/%s/quotes", symbol);
+		String response = Client.sendRequestGet(urlString);
 
-		if(cur.size() == 0)
+		try{
+			JSONObject obj = new JSONObject(response);
+			return Parser.parseQuote(obj, symbol);
+		}
+		catch (Exception e)
+		{
 			return null;
-
-		return getQuotes(cur).get(0);
+		}
 	}
 
 	//Complete
 	public static ArrayList<Quote> getQuotes(ArrayList<String> arr)
 	{
-
 		if(arr.size() == 0)
-		{
 			return new ArrayList<>();
-		}
 
-
-		StringBuilder test = new StringBuilder();
+		StringBuilder symbols = new StringBuilder();
 		for(String symbol : arr)
-		{
-			test.append(symbol.trim() + ",");
-		}
+			symbols.append(symbol.trim()).append(",");
 
+		//TODO Might be source of bugs
+		symbols.deleteCharAt(symbols.length());
 
-
-		String symbols = test.substring(0, test.length() - 1);
-
-		String urlString = "https://api.tdameritrade.com/v1/marketdata/quotes?symbol=" + symbols;
+		String urlString = String.format("https://api.tdameritrade.com/v1/marketdata/quotes?symbol=%s",symbols);
 
 		String response = Client.sendRequestGet(urlString);
 		return Parser.parseQuotes(response, arr);
@@ -126,8 +92,7 @@ public class TDARequest
 
 		String response = Client.sendRequestGet(url);
 
-		String[] one = Parser.parseMovers(response);
-		return one;
+		return Parser.parseMovers(response);
 	}
 
 	public static String[] allTopMovers(String direction)
@@ -158,26 +123,16 @@ public class TDARequest
 	}
 
 	//Need to update refresh token july 24
-	//Complete
 	public static void refreshAuthToken()
 	{
 		String urlString = "https://api.tdameritrade.com/v1/oauth2/token";
-		String post_data = "grant_type=refresh_token&refresh_token=" + Config.refreshToknn + "&access_type=&code=&client_id=" + Config.apiKey + "&redirect_uri=";
+
+		String post_data = String.format("grant_type=refresh_token&refresh_token=%s&access_type=&code=&client_id=%s&redirect_uri="
+							,Config.refreshToknn, Config.apiKey);
 
 		String response = Client.sendRequestPost(urlString, post_data);
 
 		String authToken = Parser.parsAuthToken(response);
 		Config.updateAuthToken(authToken);
 	}
-
-	public static void turnOffSimulation()
-	{
-		simulation = false;
-	}
-
-	public static void turn_on_simulation()
-	{
-		simulation = true;
-	}
 }
-
