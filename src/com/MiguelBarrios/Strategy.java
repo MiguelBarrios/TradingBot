@@ -3,7 +3,7 @@ package com.MiguelBarrios;
 public enum Strategy
 {
     TOPMOVERS("TOPMOVERS"),
-    STOCKFOLLOWER("STOCKFOLLOWER");
+    TOPGAINERS("TOPGAINERS");
 
     private String exchange;
 

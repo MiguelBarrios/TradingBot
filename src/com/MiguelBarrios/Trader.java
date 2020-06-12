@@ -61,24 +61,6 @@ public class Trader
         return TDARequest.getQuotes(symbols);
     }
 
-    public void update_open_positions()
-    {
-        ArrayList<Quote> quotes =  getActivePositionsQuotes();
-        for (Quote quote :  quotes) {
-            Order order = getOrder(quote.symbol);
-            OrderType recommendation = order.update(quote.bidprice);
-
-            String color = (order.change()) ? Color.GREEN : Color.RED;
-            System.out.print(color + order.status() + ",");
-
-            if (recommendation == OrderType.SELL) {
-                closePosition(order);
-            }
-        }
-        System.out.println(Color.RESET);
-    }
-    
-
     public void closePosition(Order order)
     {
         Trade trade = TDARequest.placeOrder(order.getSymbol(), OrderType.SELL, order.positionSize());
@@ -93,13 +75,9 @@ public class Trader
         if(activePositions.size() == 0)
             return;
 
-
-        for (Order cur : activePositions.values())
-        {
+        for (Order cur : activePositions.values()) {
             closePosition(cur);
         }
-
-
     }
 
     public void buyPosition(String symbol)
@@ -109,10 +87,9 @@ public class Trader
         if(strategy == Strategy.TOPMOVERS){
             order = new Order(trade, new TopMoversStats(trade));
         }
-        else if(strategy == Strategy.STOCKFOLLOWER){
-
+        else if(strategy == Strategy.TOPGAINERS){
+            order = new Order(trade, new TopGainersStats(trade));
         }
-
 
         //add order to currently held orders
         activePositions.put(symbol, order);

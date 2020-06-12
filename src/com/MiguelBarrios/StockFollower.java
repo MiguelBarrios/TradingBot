@@ -9,7 +9,7 @@ public class StockFollower extends TradingStrategy
     private ArrayList<String> symbols;
 
     public StockFollower(double initial_funds, double min_price, double max_price, int position_size, boolean simulation, ArrayList<String> symbols) {
-        this.trader = new Trader(initial_funds,min_price,max_price,position_size,simulation, "StockFollower" ,Strategy.STOCKFOLLOWER);
+        this.trader = new Trader(initial_funds,min_price,max_price,position_size,simulation, "StockFollower" ,Strategy.TOPGAINERS);
         this.symbols = symbols;
 
         for(String symbol : symbols) {

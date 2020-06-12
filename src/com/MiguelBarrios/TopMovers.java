@@ -58,15 +58,19 @@ public class TopMovers extends TradingStrategy
     {
         ArrayList<Quote> quotes =  trader.getActivePositionsQuotes();
         for (Quote quote :  quotes) {
-            Order order = trader.getOrder(quote.symbol);
-            OrderType recommendation = order.update(quote.bidprice);
+            if(quote != null)
+            {
+                Order order = trader.getOrder(quote.symbol);
+                OrderType recommendation = order.update(quote.bidprice);
 
-            String color = (order.change()) ? Color.GREEN : Color.RED;
-            System.out.print(color + order.status() + ",");
+                String color = (order.change()) ? Color.GREEN : Color.RED;
+                System.out.print(color + order.status() + ",");
 
-            if (recommendation == OrderType.SELL) {
-                trader.closePosition(order);
+                if (recommendation == OrderType.SELL) {
+                    trader.closePosition(order);
+                }
             }
+
         }
         System.out.println(Color.RESET);
     }

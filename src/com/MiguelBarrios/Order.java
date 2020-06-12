@@ -47,7 +47,9 @@ public class Order
                 String.valueOf(profit),
                 String.valueOf(stats.getPercentChange()),
                 String.valueOf(stats.getAbsoluteMax()),
-                String.valueOf(stats.getAbsoluteMin())
+                String.valueOf(stats.getAbsoluteMin()),
+                bought.getTime(),
+                sold.getTime()
         };
         return arr;
     }

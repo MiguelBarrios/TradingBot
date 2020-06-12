@@ -27,7 +27,7 @@ public class Log
 
 
         ordersFile = mkdir(directory + "/Orders");
-        String[] orderHeader = {"Symbol", "Bought Price", "Sold Price","Profit", "Change", "Max", "Min"};
+        String[] orderHeader = {"Symbol", "Price Bought", "Price Sold","Profit", "Change", "Max", "Min", "Time Bought", "Time Sold"};
         addHeader(ordersFile, orderHeader);
 
         quotesFile = mkdir(directory + "/Quotes");

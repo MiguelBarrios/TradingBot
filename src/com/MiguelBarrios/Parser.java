@@ -58,7 +58,15 @@ public class Parser
 
     public static String[] parseMovers(String response)
     {
-        JSONArray arr = new JSONArray(response);
+        JSONArray arr;
+        try{
+            arr = new JSONArray(response);
+        }catch (Exception e)
+        {
+            String[] tmp = new String[0];
+            return tmp;
+        }
+
         String[] symbols = new String[arr.length()];
 
         for(int i = 0; i < arr.length(); ++i)
