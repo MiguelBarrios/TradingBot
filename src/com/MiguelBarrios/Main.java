@@ -5,9 +5,16 @@ import java.util.concurrent.TimeUnit;
 
 public class Main
 {
+
     public static void main(String[] args) throws IOException
     {
+        TradingStrategy one = new TopGainers();
+        TradingStrategy two = new TopLosers();
+        one.start();
+        two.start();
+        System.out.println("End of main ");
 
+        /*
         Market market = TDARequest.marketHours();
 
         while(market == null) {
@@ -41,9 +48,9 @@ public class Main
             }
         }
 
+
+         */
     }
-
-
 
 }
 

@@ -54,6 +54,12 @@ public class TopMovers extends TradingStrategy
 
     }
 
+    @Override
+    public void run()
+    {
+
+    }
+
     public void update_open_positions()
     {
         ArrayList<Quote> quotes =  trader.getActivePositionsQuotes();

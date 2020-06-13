@@ -5,6 +5,9 @@ import java.text.SimpleDateFormat;
 
 public class Market
 {
+    public static Market market = TDARequest.marketHours();
+
+
 	public static SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	public static SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
@@ -18,6 +21,11 @@ public class Market
     private Calendar regularMarketClose;
 
     private Calendar extendedHoursClose;
+
+    public static Market getInstance()
+    {
+        return market;
+    }
 
     public Market(Date preMarketOpen, Date regularMarketOpen, Date regularMarketClose, Date extendedHoursClose)
     {

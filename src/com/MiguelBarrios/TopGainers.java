@@ -12,19 +12,36 @@ public class TopGainers extends TradingStrategy
 
     public ArrayList<String> symbols;
 
-
+    public TopGainers()
+    {
+        System.out.println("Top Gainers object made");
+    }
 
     public TopGainers(double initial_funds, double min_price, double max_price, int position_size, boolean simulation) throws IOException
     {
         symbols = Util.readInData(symbolsFilePath);
 
         this.trader = new Trader(initial_funds,min_price,max_price,position_size,simulation,"TopGainers" ,Strategy.TOPGAINERS);
-
-
     }
 
     public void run()
     {
+
+        try
+        {
+            for(int i = 0; i < 15; ++i)
+            {
+                System.out.println("Top Gainers Strategy running: Trial " + i);
+                Util.pause(2);
+            }
+
+        }
+        catch (Exception e)
+        {
+            // Throwing an exception
+            System.out.println ("Exception is caught");
+        }
+        /*
         HashMap<String, Quote> initial = new HashMap<>();
 
         ArrayList<Quote> quotes = TDARequest.getQuotes(symbols);
@@ -32,6 +49,7 @@ public class TopGainers extends TradingStrategy
         for(Quote quote :quotes ) {
             initial.put(quote.symbol, quote);
         }
+         */
 
         
 
