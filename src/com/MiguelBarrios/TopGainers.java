@@ -41,8 +41,9 @@ public class TopGainers extends TradingStrategy
 
             ArrayList<Quote> updatedQuotesList = new ArrayList<>();
 
-            while(Market.getInstance().isOpen())
+            while(Market.getInstance().isOpen(false, true))
             {
+                System.out.println("Waiting 30 sec");
                 Util.pause(30);
 
                 //Get updates for all quotes

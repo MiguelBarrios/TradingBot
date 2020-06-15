@@ -104,6 +104,7 @@ public class Parser
 
     public static ArrayList<Quote> parseQuotes(String quotesString,ArrayList<String> stocks)
     {
+        System.out.println("Parsing Quotes");
         if(stocks.size() == 0)
             return new ArrayList<>();
 
