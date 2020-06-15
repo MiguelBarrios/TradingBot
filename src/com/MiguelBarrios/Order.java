@@ -8,11 +8,19 @@ public class Order
 
      private Statistics stats;
 
+     private int positionSize;
+
     public Order(Trade bought, Statistics stats)
     {
         this.bought = bought;
         this.stats = stats;
         sold = null;
+        positionSize = bought.getNumberOfShares();
+    }
+
+    public void additionalShareBought(Trade trade)
+    {
+        positionSize += trade.getNumberOfShares();
     }
 
     public String status()
@@ -67,7 +75,7 @@ public class Order
 
     public int positionSize()
     {
-        return bought.getNumberOfShares();
+        return positionSize;
     }
 
     public double boughtFor()
@@ -80,4 +88,8 @@ public class Order
         return sold.getTotalPrice();
     }
 
+    public Statistics getStats()
+    {
+        return stats;
+    }
 }

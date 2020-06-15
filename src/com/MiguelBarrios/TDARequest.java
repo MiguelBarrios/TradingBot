@@ -24,7 +24,7 @@ public class TDARequest
 		//TODO: find a way to check the price if simulation is off, then everthing below is unnesesary
 		Quote quote = getQuote(symbol);
 		if(quote != null) {
-			double price = (type == OrderType.SELL) ? quote.bidprice : quote.askPrice;
+			double price = (type == OrderType.SELL) ? quote.getBidprice() : quote.getAskPrice();
 			return new Trade(type, numShares, price, symbol);
 		}
 
@@ -77,7 +77,7 @@ public class TDARequest
 			symbols.append(symbol.trim()).append(",");
 
 		//TODO Might be source of bugs
-		symbols.deleteCharAt(symbols.length());
+		symbols.deleteCharAt(symbols.length() - 1);
 
 		String urlString = String.format("https://api.tdameritrade.com/v1/marketdata/quotes?symbol=%s",symbols);
 

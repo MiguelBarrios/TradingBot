@@ -48,7 +48,6 @@ public class Trade
         return arr;
     }
 
-
     public Trade(OrderType type, int numberOfShares, double price, String symbol)
     {
         this.orderType = type;

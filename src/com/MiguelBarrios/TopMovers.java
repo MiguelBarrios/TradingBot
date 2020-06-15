@@ -33,7 +33,7 @@ public class TopMovers extends TradingStrategy
             if(quotesMovers.size() != 0) {
                 for(Quote quote : quotesMovers) {
                     if(trader.isEligible(quote)) {
-                        trader.buyPosition(quote.symbol);
+                        trader.buyPosition(quote);
                     }
                 }
             }
@@ -66,8 +66,8 @@ public class TopMovers extends TradingStrategy
         for (Quote quote :  quotes) {
             if(quote != null)
             {
-                Order order = trader.getOrder(quote.symbol);
-                OrderType recommendation = order.update(quote.bidprice);
+                Order order = trader.getOrder(quote.getSymbol());
+                OrderType recommendation = order.update(quote.getBidprice());
 
                 String color = (order.change()) ? Color.GREEN : Color.RED;
                 System.out.print(color + order.status() + ",");

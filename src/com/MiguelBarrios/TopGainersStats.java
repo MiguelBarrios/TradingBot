@@ -2,25 +2,17 @@ package com.MiguelBarrios;
 
 public class TopGainersStats extends Statistics
 {
-    private static final double DEFAULT_FACTOR = 0.02;
+    private static final double SELL_FACTOR = -0.02;
 
-    private static final double INITIAL_PRICE_FACTOR = 0.015;
+    private static final double INCREASE_FACTOR = 0.05;
+
+    private static double ADDITIONAL_PURCHASE_FACTOR = 0.05;
 
     private final double initialPrice;
-
-    private final boolean shortPosition;
-
-    private final double sellPriceInit;
-
-    private final double factor;
-
-    private double currentPrice;
 
     private double absoluteMax;
 
     private double absoluteMin;
-
-    private double percentChange;
 
     private double sellPrice;
 
@@ -31,29 +23,34 @@ public class TopGainersStats extends Statistics
 
     public TopGainersStats(double initialPrice, OrderType type)
     {
-        this(initialPrice, type, DEFAULT_FACTOR);
+        this(initialPrice, type, SELL_FACTOR);
     }
 
     public TopGainersStats(double initialPrice, OrderType type, double factor)
     {
-        this.initialPrice = this.currentPrice =  absoluteMax = absoluteMin = initialPrice;
+        this.initialPrice =  absoluteMax = absoluteMin = initialPrice;
 
-        this.factor = factor;
-
-        percentChange = 0;
-
-        shortPosition = (type == OrderType.SHORT);
-
-        int isShort = (shortPosition) ? 1 : -1;
-
-        sellPrice = absoluteMin  + (absoluteMin * factor * isShort);
-        sellPriceInit = initialPrice + (initialPrice * INITIAL_PRICE_FACTOR * isShort);
     }
 
     @Override
-    public OrderType update(double price)
+    public OrderType update(double updatedPrice)
     {
-        return null;
+        double change = Util.percentChange(absoluteMax, updatedPrice);
+        if(change <= SELL_FACTOR)
+            return OrderType.SELL;
+
+        if(change >= ADDITIONAL_PURCHASE_FACTOR)
+        {
+            ADDITIONAL_PURCHASE_FACTOR += INCREASE_FACTOR;
+            return OrderType.BUY;
+        }
+
+        if(updatedPrice > absoluteMax)
+            absoluteMax = updatedPrice;
+        if(updatedPrice < absoluteMin)
+            absoluteMin = updatedPrice;
+
+        return OrderType.HOLD;
     }
 
     @Override

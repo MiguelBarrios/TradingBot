@@ -64,8 +64,8 @@ public class Trader
     public void closePosition(Order order)
     {
         Trade trade = TDARequest.placeOrder(order.getSymbol(), OrderType.SELL, order.positionSize());
-        Order completedOrder = order.close(trade);
-        log.saveOrder(completedOrder);
+        log.saveTrade(trade);
+        order.close(trade);
         activePositions.remove(order.getSymbol());
         closedPositions.add(order.getSymbol());
     }
@@ -80,9 +80,40 @@ public class Trader
         }
     }
 
-    public void buyPosition(String symbol)
+    public int buyAdditionalShares(Order order)
     {
+        String symbol = order.getSymbol();
         Trade trade = TDARequest.placeOrder(symbol, OrderType.BUY,position_size);
+        if(trade == null)
+            return -1;
+
+        log.saveTrade(trade);
+
+        order.additionalShareBought(trade);
+
+        return 1;
+    }
+
+    /**
+     * @param quote current quote
+     * @return -2: does not meet requirements
+     *         -1: Error occurred placing order
+     *          1: Order place successfully
+     */
+    public int buyPosition(Quote quote)
+    {
+        String symbol = quote.getSymbol();
+        if(!isEligible(quote)){
+            return -2;
+        }
+
+        Trade trade = TDARequest.placeOrder(symbol, OrderType.BUY,position_size);
+        if(trade == null) {
+            return -1;
+        }
+
+        log.saveTrade(trade);
+
         Order order = null;
         if(strategy == Strategy.TOPMOVERS){
             order = new Order(trade, new TopMoversStats(trade));
@@ -94,12 +125,13 @@ public class Trader
         //add order to currently held orders
         activePositions.put(symbol, order);
         remaining_funds -= order.boughtFor();
+        return 1;
     }
 
     public boolean isEligible(Quote quote)
     {
-        String symbol = quote.symbol;
-        double price = quote.askPrice;
+        String symbol = quote.getSymbol();
+        double price = quote.getAskPrice();
 
         //check to see if price is less then the max you are willing to pay for it
         if(price > max_price || price < min_price) {
@@ -116,6 +148,27 @@ public class Trader
         return (fundsNeeded <= remaining_funds);
     }
 
+    public boolean hasOpenPosition(String symbol)
+    {
+        return activePositions.contains(symbol);
+    }
+
+    public void updatePosition(Quote quote){
+        Order order = getOrder(quote.getSymbol());
+        OrderType orderType = order.update(quote.getAskPrice());
+
+        if(orderType == OrderType.SELL)
+        {
+            closePosition(order);
+        }
+        else if(orderType == OrderType.BUY)
+        {
+            buyAdditionalShares(order);
+        }
+
+    }
+
+
     public int num_open_positions()
     {
         return activePositions.size();
@@ -124,6 +177,11 @@ public class Trader
     public boolean hasEncountered(String symbol)
     {
         return !previouslyEncountered.add(symbol);
+    }
+
+    public void updateAllActivePositions()
+    {
+
     }
 
 

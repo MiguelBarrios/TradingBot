@@ -2,27 +2,27 @@ package com.MiguelBarrios;
 
 public class Quote
 {
-    public final String symbol;
+    private final String symbol;
 
-    public final  double bidprice;
+    private final  double bidprice;
 
-    public final int bidSize;
+    private final int bidSize;
 
-    public final double askPrice;
+    private final double askPrice;
 
-    public final int askSize;
+    private final int askSize;
 
-    public final double netChange;
+    private final double netChange;
 
-    public final boolean shortable;
+    private final boolean shortable;
 
-    public final int totalVolume;
+    private final int totalVolume;
 
-    public final double volitility;
+    private final double volitility;
 
-    public final double regularMarketNetChange;
+    private final double regularMarketNetChange;
 
-    public final long time;
+    private final long time;
 
     public Quote(String symbol, double bidprice, int bidSize, double askPrice, int askSize, double netChange, int totalVolume, boolean shortable, double volitility, double regularMarketNetChange)
     {
@@ -57,6 +57,25 @@ public class Quote
         return arr;
     }
 
+    public String getSymbol()
+    {
+        return symbol;
+    }
+
+    public double getBidprice()
+    {
+        return bidprice;
+    }
+
+    public double getAskPrice()
+    {
+        return askPrice;
+    }
+
+    public boolean isShortable()
+    {
+        return shortable;
+    }
 
     @Override
     public String toString()

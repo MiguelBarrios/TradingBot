@@ -46,4 +46,9 @@ public class Util
 
         return null;
     }
+
+    public static double percentChange(double initial, double update)
+    {
+        return (update - initial) / initial;
+    }
 }

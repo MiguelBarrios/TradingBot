@@ -94,4 +94,19 @@ public class Market
     		time.format(extendedHoursClose.getTime()));
     }
 
+    public static Market waitUntilOpen()
+    {
+        Market market = TDARequest.marketHours();
+        while(market == null) {
+            System.out.println("Waiting for market to open");
+            Util.pause(60);
+            market = TDARequest.marketHours();
+        }
+
+        while(!market.isOpen(false, true)) {
+            System.out.println("Waiting for main market to open ...");
+            Util.pause(20);
+        }
+        return market;
+    }
 }
