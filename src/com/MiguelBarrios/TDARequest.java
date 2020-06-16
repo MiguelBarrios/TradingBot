@@ -72,27 +72,26 @@ public class TDARequest
 		if(arr.size() == 0)
 			return new ArrayList<>();
 
-
 		ArrayList<Quote> quotes = new ArrayList<>();
 		StringBuilder symbols = new StringBuilder();
-		for(int i = 0; i < arr.size(); ++i)
+		for(int i = 0, j = 1; i < arr.size(); ++i, ++j)
 		{
-			if((i + 1) % 500 != 0)
+			if(j <= 500)
 			{
-				for(String symbol : arr)
-					symbols.append(symbol.trim()).append(",");
+				symbols.append(arr.get(i)).append(",");
 			}
 			else
 			{
-				//TODO Might be source of bugs
+				j = 1;
 				symbols.deleteCharAt(symbols.length() - 1);
+				String cur = symbols.toString();
+				String urlString = String.format("https://api.tdameritrade.com/v1/marketdata/quotes?symbol=%s",cur);
 
-				String urlString = String.format("https://api.tdameritrade.com/v1/marketdata/quotes?symbol=%s",symbols);
-
-				System.out.println("Sending Request");
+				System.out.print("Sending Request -> ");
 				String response = Client.sendRequestGet(urlString);
-				System.out.println(response);
-				quotes.addAll(Parser.parseQuotes(response, arr));
+
+				ArrayList<Quote> newQuotes = Parser.parseQuotes(response, arr);
+				quotes.addAll(newQuotes);
 				symbols = new StringBuilder();
 			}
 		}
@@ -103,12 +102,11 @@ public class TDARequest
 
 			String urlString = String.format("https://api.tdameritrade.com/v1/marketdata/quotes?symbol=%s",symbols);
 
-			System.out.println("Sending Request");
+			System.out.print("Sending Request -> ");
 			String response = Client.sendRequestGet(urlString);
-			System.out.println(response);
 			quotes.addAll(Parser.parseQuotes(response, arr));
 		}
-
+		System.out.println("Cycle complete");
 		return quotes;
 	}
 
@@ -161,6 +159,7 @@ public class TDARequest
 		String response = Client.sendRequestPost(urlString, post_data);
 
 		String authToken = Parser.parsAuthToken(response);
+		System.out.println(authToken);
 		Config.updateAuthToken(authToken);
 	}
 }

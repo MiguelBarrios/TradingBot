@@ -2,6 +2,8 @@ package com.MiguelBarrios;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import javax.xml.bind.SchemaOutputResolver;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -96,7 +98,7 @@ public class Parser
         }
         catch (Exception e)
         {
-            System.out.println(symbol + " Not Found");
+            //do nothing
         }
         return null;
     }
@@ -104,7 +106,7 @@ public class Parser
 
     public static ArrayList<Quote> parseQuotes(String quotesString,ArrayList<String> stocks)
     {
-        System.out.println("Parsing Quotes");
+        System.out.print("Parsing Quotes ->");
         if(stocks.size() == 0)
             return new ArrayList<>();
 
@@ -115,7 +117,8 @@ public class Parser
             for(String symbol : stocks)
             {
                 Quote quote = parseQuote(response, symbol);
-                quotes.add(quote);
+                if(quote != null)
+                    quotes.add(quote);
             }
         }
         catch(Exception e)

@@ -40,12 +40,26 @@ public class Client
             String auth = String.format("Bearer %s", Config.getAuthToken());
             httpURLConnection.setRequestProperty("Authorization", auth);
 
-            return readResponse(httpURLConnection);
+            String line = "";
+            InputStreamReader inputStreamReader = new InputStreamReader(httpURLConnection.getInputStream());
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            StringBuilder response = new StringBuilder();
+            while((line = bufferedReader.readLine()) != null)
+            {
+                response.append(line);
+            }
+
+            bufferedReader.close();
+
+            return response.toString();
         }
-        catch (Exception e) {
-            System.out.println("Error sendingRequestGet");
-            return "";
+        catch (Exception e)
+        {
+            System.out.println("Error getting request");
+            e.printStackTrace();
         }
+
+        return null;
     }
 
     public static String sendRequestPost(String urlString, String post_data)

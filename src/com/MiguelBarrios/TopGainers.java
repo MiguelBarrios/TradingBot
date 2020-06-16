@@ -35,6 +35,7 @@ public class TopGainers extends TradingStrategy
         try
         {
             //Initial quotes
+            System.out.print("Getting initial Quotes -> ");
             ArrayList<Quote> quoteMins = TDARequest.getQuotes(symbols);
             for(Quote quote : quoteMins)
                 minQuote.put(quote.getSymbol(), quote);
@@ -47,6 +48,7 @@ public class TopGainers extends TradingStrategy
                 Util.pause(30);
 
                 //Get updates for all quotes
+                System.out.print("Getting quote updates -> ");
                 updatedQuotesList = TDARequest.getQuotes(symbols);
 
                 for(Quote currentQuote: updatedQuotesList)
@@ -56,6 +58,7 @@ public class TopGainers extends TradingStrategy
                     double lowestPrice = minQuote.get(symbol).getAskPrice();
                     double updatedPrice = currentQuote.getAskPrice();
                     double change = Util.percentChange(lowestPrice, updatedPrice);
+                    System.out.println(symbol + " " + change);
 
                     if(trader.hasOpenPosition(symbol))
                     {
@@ -79,14 +82,13 @@ public class TopGainers extends TradingStrategy
                 }
 
             }
+
             trader.closeAllOpenPositions();
 
 
         }
         catch (Exception e)
         {
-            // Throwing an exception
-            System.out.println ("Exception is caught");
             e.printStackTrace();
         }
 
