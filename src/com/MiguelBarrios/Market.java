@@ -60,7 +60,7 @@ public class Market
         // +1 to ofset timezone
         cur.setHours(cur.getHours() + 1);
 
-        cur.setMinutes(cur.getMinutes());
+        cur.setMinutes(cur.getMinutes() + 5);
 
         //TODO: simplify logic
         if(!pre && !afterHours)

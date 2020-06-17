@@ -10,7 +10,6 @@ public class TopMovers extends TradingStrategy
         this.trader = new Trader(initial_funds,min_price,max_price,position_size,simulation,"TopMovers" ,Strategy.TOPMOVERS);
     }
 
-    @Override
     public void cycle() {
         ArrayList<String> trendingUp = new ArrayList<>(20);
 
@@ -42,19 +41,17 @@ public class TopMovers extends TradingStrategy
         update_open_positions();
     }
 
-    @Override
     public void closeAllPositions()
     {
         trader.closeAllOpenPositions();
     }
 
-    @Override
     public void update()
     {
 
     }
 
-    @Override
+
     public void run()
     {
 

@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TopGainers extends TradingStrategy
 {
-    public static String symbolsFilePath = "/Users/miguelbarrios/Documents/Projects/WebScrapers/Stocks/symbols.txt";
+    public static String symbolsFilePath = "/Users/miguelbarrios/Documents/Projects/WebScrapers/stockSymbolsWebScraper/symbols.txt";
 
     private Trader trader;
 
@@ -15,6 +15,8 @@ public class TopGainers extends TradingStrategy
     public static ConcurrentHashMap<String, Quote> minQuote;
 
     public static ConcurrentHashMap<String, Quote> currentQuotes;
+
+    public static final double SPREAD_FACTOR = 0.025;
 
     public TopGainers() throws IOException
     {
@@ -31,18 +33,19 @@ public class TopGainers extends TradingStrategy
 
     public void run()
     {
-        System.out.println("Thread started");
         try
         {
             //Initial quotes
             System.out.print("Getting initial Quotes -> ");
             ArrayList<Quote> quoteMins = TDARequest.getQuotes(symbols);
+            trader.saveQuotes(quoteMins);
+
             for(Quote quote : quoteMins)
                 minQuote.put(quote.getSymbol(), quote);
 
             ArrayList<Quote> updatedQuotesList = new ArrayList<>();
 
-            while(Market.getInstance().isOpen(false, true))
+            while(Market.getInstance().isOpen(false, false))
             {
                 System.out.println("Waiting 30 sec");
                 Util.pause(30);
@@ -50,37 +53,39 @@ public class TopGainers extends TradingStrategy
                 //Get updates for all quotes
                 System.out.print("Getting quote updates -> ");
                 updatedQuotesList = TDARequest.getQuotes(symbols);
-
                 for(Quote currentQuote: updatedQuotesList)
                 {
-                    //Check first if we have an open position
                     String symbol = currentQuote.getSymbol();
-                    double lowestPrice = minQuote.get(symbol).getAskPrice();
-                    double updatedPrice = currentQuote.getAskPrice();
-                    double change = Util.percentChange(lowestPrice, updatedPrice);
-                    System.out.println(symbol + " " + change);
 
                     if(trader.hasOpenPosition(symbol))
                     {
                         trader.updatePosition(currentQuote);
                     }
-                    else if (change >= 0.05)
+                    else if(minQuote.containsKey(symbol))
                     {
-                        int purchased = trader.buyPosition(currentQuote);
-                        if(purchased == 1 || purchased == -2) {
-                            minQuote.remove(symbol);
-                            symbols.remove(symbol);
-                        }
-                    }
-                    else if(change < 0)
-                    {
-                        if(updatedPrice < lowestPrice) {
-                            minQuote.put(symbol, currentQuote);
-                        }
-                    }
+                        double lowestPrice = minQuote.get(symbol).getAskPrice();
+                        double updatedPrice = currentQuote.getAskPrice();
+                        double change = Util.percentChange(lowestPrice, updatedPrice);
 
+                        //TODO: update to allow purchase if price peoplle are willing to pay is greater than sell
+                        if(change >= 0.05 && spread(currentQuote) <= SPREAD_FACTOR)
+                        {
+                            int purchased = trader.buyPosition(currentQuote);
+                            if(purchased == 1 || purchased == -2) {
+                                minQuote.remove(symbol);
+                                symbols.remove(symbol);
+                            }
+                        }
+                        else if(change < 0)
+                        {
+                            if(updatedPrice < lowestPrice) {
+                                minQuote.put(symbol, currentQuote);
+                            }
+                        }
+                    }
                 }
 
+                trader.saveQuotes(updatedQuotesList);
             }
 
             trader.closeAllOpenPositions();
@@ -94,21 +99,8 @@ public class TopGainers extends TradingStrategy
 
     }
 
-    @Override
-    public void cycle()
+    private double spread(Quote quote)
     {
-
-    }
-
-    @Override
-    public void closeAllPositions()
-    {
-
-    }
-
-    @Override
-    public void update()
-    {
-
+        return Math.abs(Util.percentChange(quote.getAskPrice(),quote.getBidprice()));
     }
 }

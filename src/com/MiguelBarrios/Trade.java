@@ -56,7 +56,7 @@ public class Trade
         this.price = price;
         totalPrice = price * numberOfShares;
         time = new Date();
-        System.out.println(String.format("%s %d %s %f", type, numberOfShares, symbol, price));
+        System.out.println(Color.GREEN + String.format("%s %d %s %f", type, numberOfShares, symbol, price) +  Color.RESET);
     }
 
     public String getSymbol()

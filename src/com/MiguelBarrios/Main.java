@@ -5,8 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Main
 {
-
-
     public static void main(String[] args) throws IOException
     {
         Market market = Market.waitUntilOpen();
@@ -26,8 +24,6 @@ public class Main
             }
             Util.pause(120);
         }
-
-        System.out.println("Main Ended");
     }
 
 }

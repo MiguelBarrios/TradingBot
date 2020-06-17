@@ -2,7 +2,7 @@ package com.MiguelBarrios;
 
 public class TopGainersStats extends Statistics
 {
-    private static final double SELL_FACTOR = -0.02;
+    private static final double SELL_FACTOR = -0.01;
 
     private static final double INCREASE_FACTOR = 0.05;
 

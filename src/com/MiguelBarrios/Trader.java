@@ -1,5 +1,6 @@
 package com.MiguelBarrios;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,6 +28,11 @@ public class Trader
 
     private Log log;
 
+    public void saveQuotes(ArrayList<Quote> quotes)
+    {
+        log.saveQuotes(quotes);
+    }
+
     public Trader(double initial_funds, double min_price, double max_price, int position_size, boolean simulation, String directory, Strategy strategy)
     {
         this.initial_funds = initial_funds;
@@ -42,7 +48,6 @@ public class Trader
         previouslyEncountered = new HashSet<>();
 
         this.log = new Log(directory);
-
     }
 
     public Order getOrder(String symbol)
@@ -70,6 +75,7 @@ public class Trader
         closedPositions.add(order.getSymbol());
     }
 
+    //TODO: if closing all at one add pause cause it is resulting in a too many request resonse code: 429
     public void closeAllOpenPositions()
     {
         if(activePositions.size() == 0)
