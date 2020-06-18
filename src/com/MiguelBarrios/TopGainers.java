@@ -53,6 +53,7 @@ public class TopGainers extends TradingStrategy
                 //Get updates for all quotes
                 System.out.print("Getting quote updates -> ");
                 updatedQuotesList = TDARequest.getQuotes(symbols);
+                //Todo:fix  we are not updating the active orders, because we removed them from min quotes
                 for(Quote currentQuote: updatedQuotesList)
                 {
                     String symbol = currentQuote.getSymbol();
@@ -73,7 +74,6 @@ public class TopGainers extends TradingStrategy
                             int purchased = trader.buyPosition(currentQuote);
                             if(purchased == 1 || purchased == -2) {
                                 minQuote.remove(symbol);
-                                symbols.remove(symbol);
                             }
                         }
                         else if(change < 0)

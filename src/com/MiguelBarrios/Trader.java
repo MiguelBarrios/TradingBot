@@ -83,6 +83,7 @@ public class Trader
 
         for (Order cur : activePositions.values()) {
             closePosition(cur);
+            Util.pause(1);
         }
     }
 

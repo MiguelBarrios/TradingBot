@@ -40,6 +40,7 @@ public class Client
             String auth = String.format("Bearer %s", Config.getAuthToken());
             httpURLConnection.setRequestProperty("Authorization", auth);
 
+
             String line = "";
             InputStreamReader inputStreamReader = new InputStreamReader(httpURLConnection.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -56,6 +57,7 @@ public class Client
         catch (Exception e)
         {
             System.out.println("Error getting request");
+
             e.printStackTrace();
         }
 
