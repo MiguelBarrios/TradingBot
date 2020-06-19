@@ -157,7 +157,7 @@ public class Trader
 
     public boolean hasOpenPosition(String symbol)
     {
-        return activePositions.contains(symbol);
+        return activePositions.containsKey(symbol);
     }
 
     public void updatePosition(Quote quote){

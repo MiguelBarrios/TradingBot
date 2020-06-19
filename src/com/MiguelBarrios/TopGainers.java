@@ -12,7 +12,9 @@ public class TopGainers extends TradingStrategy
 
     public static ArrayList<String> symbols;
 
-    public static ConcurrentHashMap<String, Quote> minQuote;
+    public static int NUM_SYMBOLS;
+
+    public static ConcurrentHashMap<String, Quote> symbolQuotes;
 
     public static ConcurrentHashMap<String, Quote> currentQuotes;
 
@@ -27,8 +29,9 @@ public class TopGainers extends TradingStrategy
     {
         System.out.println("Top Gainers thread created");
         symbols = Util.readInData(symbolsFilePath);
+        NUM_SYMBOLS = symbols.size();
         this.trader = new Trader(initial_funds,min_price,max_price,position_size,simulation,"TopGainers" ,Strategy.TOPGAINERS);
-        minQuote = new ConcurrentHashMap<>();
+        symbolQuotes = new ConcurrentHashMap<>();
     }
 
     public void run()
@@ -36,24 +39,21 @@ public class TopGainers extends TradingStrategy
         try
         {
             //Initial quotes
-            System.out.print("Getting initial Quotes -> ");
             ArrayList<Quote> quoteMins = TDARequest.getQuotes(symbols);
             trader.saveQuotes(quoteMins);
 
             for(Quote quote : quoteMins)
-                minQuote.put(quote.getSymbol(), quote);
+                symbolQuotes.putIfAbsent(quote.getSymbol(),quote);
 
-            ArrayList<Quote> updatedQuotesList = new ArrayList<>();
+            ArrayList<Quote> updatedQuotesList;
 
-            while(Market.getInstance().isOpen(false, false))
+            while(Market.getInstance().isOpen(false, true))
             {
                 System.out.println("Waiting 30 sec");
                 Util.pause(30);
 
                 //Get updates for all quotes
-                System.out.print("Getting quote updates -> ");
                 updatedQuotesList = TDARequest.getQuotes(symbols);
-                //Todo:fix  we are not updating the active orders, because we removed them from min quotes
                 for(Quote currentQuote: updatedQuotesList)
                 {
                     String symbol = currentQuote.getSymbol();
@@ -62,9 +62,9 @@ public class TopGainers extends TradingStrategy
                     {
                         trader.updatePosition(currentQuote);
                     }
-                    else if(minQuote.containsKey(symbol))
+                    else if(symbolQuotes.containsKey(symbol))
                     {
-                        double lowestPrice = minQuote.get(symbol).getAskPrice();
+                        double lowestPrice = symbolQuotes.get(symbol).getAskPrice();
                         double updatedPrice = currentQuote.getAskPrice();
                         double change = Util.percentChange(lowestPrice, updatedPrice);
 
@@ -73,13 +73,13 @@ public class TopGainers extends TradingStrategy
                         {
                             int purchased = trader.buyPosition(currentQuote);
                             if(purchased == 1 || purchased == -2) {
-                                minQuote.remove(symbol);
+                                symbolQuotes.remove(symbol);
                             }
                         }
                         else if(change < 0)
                         {
                             if(updatedPrice < lowestPrice) {
-                                minQuote.put(symbol, currentQuote);
+                                symbolQuotes.put(symbol, currentQuote);
                             }
                         }
                     }
