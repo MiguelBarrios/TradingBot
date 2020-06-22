@@ -77,6 +77,11 @@ public class Quote
         return shortable;
     }
 
+    public int getTotalVolume()
+    {
+        return totalVolume;
+    }
+
     @Override
     public String toString()
     {

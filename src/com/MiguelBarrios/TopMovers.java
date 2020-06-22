@@ -31,7 +31,7 @@ public class TopMovers extends TradingStrategy
 
             if(quotesMovers.size() != 0) {
                 for(Quote quote : quotesMovers) {
-                    if(trader.isEligible(quote)) {
+                    if(trader.isEligibleForPurchase(quote)) {
                         trader.buyPosition(quote);
                     }
                 }

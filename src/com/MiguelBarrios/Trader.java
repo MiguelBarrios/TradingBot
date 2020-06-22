@@ -1,6 +1,5 @@
 package com.MiguelBarrios;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,6 +17,10 @@ public class Trader
 
     public final boolean simulation;
 
+    public final int volumeReq;
+
+    public final double minSpread;
+
     private ConcurrentHashMap<String, Order> activePositions;
 
     private HashSet<String> closedPositions = new HashSet<>();
@@ -33,7 +36,7 @@ public class Trader
         log.saveQuotes(quotes);
     }
 
-    public Trader(double initial_funds, double min_price, double max_price, int position_size, boolean simulation, String directory, Strategy strategy)
+    public Trader(double initial_funds, double min_price, double max_price, int position_size, boolean simulation,int volumeReq, double spread, String directory, Strategy strategy)
     {
         this.initial_funds = initial_funds;
         this.remaining_funds = initial_funds;
@@ -42,6 +45,8 @@ public class Trader
         this.position_size = position_size;
         this.simulation = simulation;
         this.strategy = strategy;
+        this.volumeReq = volumeReq;
+        this.minSpread = spread;
 
         activePositions = new ConcurrentHashMap<>();
         closedPositions = new HashSet<>();
@@ -49,6 +54,7 @@ public class Trader
 
         this.log = new Log(directory);
     }
+
 
     public Order getOrder(String symbol)
     {
@@ -103,16 +109,12 @@ public class Trader
 
     /**
      * @param quote current quote
-     * @return -2: does not meet requirements
-     *         -1: Error occurred placing order
+     * @return -1: Error occurred placing order
      *          1: Order place successfully
      */
     public int buyPosition(Quote quote)
     {
         String symbol = quote.getSymbol();
-        if(!isEligible(quote)){
-            return -2;
-        }
 
         Trade trade = TDARequest.placeOrder(symbol, OrderType.BUY,position_size);
         if(trade == null) {
@@ -135,13 +137,21 @@ public class Trader
         return 1;
     }
 
-    public boolean isEligible(Quote quote)
+    public boolean isEligibleForPurchase(Quote quote)
     {
         String symbol = quote.getSymbol();
         double price = quote.getAskPrice();
 
         //check to see if price is less then the max you are willing to pay for it
         if(price > max_price || price < min_price) {
+            return false;
+        }
+
+        if(spread(quote) > minSpread)
+            return false;
+
+        //Check to see if it meets volume Requirements
+        if(quote.getTotalVolume() < volumeReq) {
             return false;
         }
 
@@ -189,6 +199,11 @@ public class Trader
     public void updateAllActivePositions()
     {
 
+    }
+
+    private double spread(Quote quote)
+    {
+        return Math.abs(Util.percentChange(quote.getAskPrice(),quote.getBidprice()));
     }
 
 
