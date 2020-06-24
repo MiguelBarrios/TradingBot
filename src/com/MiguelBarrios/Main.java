@@ -17,7 +17,7 @@ public class Main
         gainers.start();
 
         //Check to see if we need to refresh auth Token
-        while(market.isOpen(false, true)) {
+        while(market.isOpen()) {
             if((System.currentTimeMillis() - startTime) > 1500000) {
                 startTime = System.currentTimeMillis();
                 TDARequest.refreshAuthToken();

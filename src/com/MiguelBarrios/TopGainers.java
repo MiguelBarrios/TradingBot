@@ -39,6 +39,7 @@ public class TopGainers extends TradingStrategy
             for(Quote quote : initialQuotes)
                 unpurchasedStocks.putIfAbsent(quote.getSymbol(),quote);
 
+
             while(Market.getInstance().isOpen())
             {
                 System.out.println("Waiting 30 sec");   Util.pause(30);
@@ -60,7 +61,7 @@ public class TopGainers extends TradingStrategy
                         double change = Util.percentChange(lowestPrice, updatedPrice);
 
                         //TODO: update to allow purchase if price peoplle are willing to pay is greater than sell
-                        if(change >= 0.05 && trader.isEligibleForPurchase(currentQuote))
+                        if(change >= 0.1 && trader.isEligibleForPurchase(currentQuote))
                         {
                             int purchased = trader.buyPosition(currentQuote);
                             if(purchased == 1 || purchased == -2) {

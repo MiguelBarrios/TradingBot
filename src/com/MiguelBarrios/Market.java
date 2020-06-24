@@ -56,16 +56,18 @@ public class Market
     public boolean isOpen(boolean pre, boolean afterHours)
     {
         Date cur = new Date(System.currentTimeMillis());
-
         // +1 to ofset timezone
         cur.setHours(cur.getHours() + 1);
 
-        cur.setMinutes(cur.getMinutes() + 5);
+        Date open = regularMarketOpen.getTime();
+        Date close = regularMarketClose.getTime();
+        close.setMinutes(close.getMinutes() - 5);
+
 
         //TODO: simplify logic
         if(!pre && !afterHours)
         {
-            return (cur.after(regularMarketOpen.getTime()) && cur.before(regularMarketClose.getTime()));
+            return (cur.after(open) && cur.before(close));
         }
         else if(pre && afterHours)
         {
