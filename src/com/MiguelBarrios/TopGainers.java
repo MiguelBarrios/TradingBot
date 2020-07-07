@@ -40,9 +40,8 @@ public class TopGainers extends TradingStrategy
                 unpurchasedStocks.putIfAbsent(quote.getSymbol(),quote);
 
 
-            while(Market.getInstance().isOpen())
+            while(true)
             {
-                System.out.println("Waiting 30 sec");   Util.pause(30);
 
                 //Get updates for all quotes
                 ArrayList<Quote> updatedQuotesList = TDARequest.getQuotes(symbols);
@@ -80,7 +79,7 @@ public class TopGainers extends TradingStrategy
                 trader.saveQuotes(updatedQuotesList);
             }
 
-            trader.closeAllOpenPositions();
+            //trader.closeAllOpenPositions();
         }
         catch (Exception e)
         {

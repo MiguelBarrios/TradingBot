@@ -26,35 +26,6 @@ public class Parser
         return null;
     }
 
-    public static Market parseMarketHours(String responseString)
-    {
-        try{
-            JSONObject json = new JSONObject(responseString);
-
-            JSONObject sessionHours = json.getJSONObject("equity")
-                    .getJSONObject("EQ")
-                    .getJSONObject("sessionHours");
-
-
-            JSONObject regularMarket = sessionHours.getJSONArray("regularMarket").getJSONObject(0);
-            Date regularMarketOpen = sdf.parse(regularMarket.getString("start").substring(0, 19));
-            Date regularMarketClose = sdf.parse(regularMarket.getString("end").substring(0, 19));
-
-            String preMarket = sessionHours.getJSONArray("preMarket").getJSONObject(0).getString("start").substring(0, 19);
-            String postMarket = sessionHours.getJSONArray("postMarket").getJSONObject(0).getString("end").substring(0,19);
-
-            Date preMarketOpen = sdf.parse(preMarket);
-            Date postMarketClose = sdf.parse(postMarket);
-
-            return new Market(preMarketOpen, regularMarketOpen, regularMarketClose, postMarketClose);
-
-        }catch (Exception e)
-        {
-            return null;
-        }
-
-    }
-
 
     public static ArrayList<Mover> parseMovers(String response)
     {

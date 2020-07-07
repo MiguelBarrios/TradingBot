@@ -1,114 +1,51 @@
 package com.MiguelBarrios;
+import java.time.Year;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
 
 public class Market
 {
-    public static Market market = TDARequest.marketHours();
+    public static SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-
-	public static SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-	public static SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-	public static SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
+    public static SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+    public static SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
     //String formattedTime = output.format(d);
 
-    private Calendar preMarketOpen;
 
-    private Calendar regularMarketOpen;
+    public long startTrading;
 
-    private Calendar regularMarketClose;
+    public long stopTrading;
 
-    private Calendar extendedHoursClose;
-
-    public static Market getInstance()
+    public Market(Date startTrading, Date stopTrading)
     {
-        return market;
+        this.startTrading = startTrading.getTime();
+        this.stopTrading = stopTrading.getTime();
     }
 
-    public Market(Date preMarketOpen, Date regularMarketOpen, Date regularMarketClose, Date extendedHoursClose)
-    {
-        this.preMarketOpen = Calendar.getInstance();
-        this.regularMarketOpen = Calendar.getInstance();
-        this.regularMarketClose = Calendar.getInstance();
-        this.extendedHoursClose = Calendar.getInstance();
-
-        this.preMarketOpen.setTime(preMarketOpen);
-        this.regularMarketOpen.setTime(regularMarketOpen);
-        this.regularMarketClose.setTime(regularMarketClose);
-        this.extendedHoursClose.setTime(extendedHoursClose);
-    }
-
-    //if we want to trade from start of pre market to after hours market
     public boolean isOpen()
     {
-    	return isOpen(false, false);
+        long now = System.currentTimeMillis();
+    	return (now > startTrading) && (now < stopTrading);
+
     }
 
-    /**
-     * Set the following true if we want to trade in the
-     * Default is for regular market hours
-     * @param pre pre market
-     * @param afterHours post market
-     * @return
-     */
-    public boolean isOpen(boolean pre, boolean afterHours)
+    public void waitForMarketToOpen() throws InterruptedException
     {
-        Date cur = new Date(System.currentTimeMillis());
-        // +1 to ofset timezone
-        cur.setHours(cur.getHours() + 1);
-
-        Date open = regularMarketOpen.getTime();
-        Date close = regularMarketClose.getTime();
-        close.setMinutes(close.getMinutes() - 5);
-
-
-        //TODO: simplify logic
-        if(!pre && !afterHours)
-        {
-            return (cur.after(open) && cur.before(close));
-        }
-        else if(pre && afterHours)
-        {
-            return (cur.after(preMarketOpen.getTime()) && cur.before(extendedHoursClose.getTime()));
-        }
-        else if(pre && !afterHours)
-        {
-            return (cur.after(preMarketOpen.getTime()) && cur.before(regularMarketClose.getTime()));
-        }
-        else if(!pre && afterHours)
-        {
-            return (cur.after(regularMarketOpen.getTime()) && cur.before(extendedHoursClose.getTime()));
-        }
-
-        return false;
+        long now = System.currentTimeMillis();
+        long waitTime = startTrading - now;
+        System.out.println("Waiting: " + time.format(waitTime));
+        TimeUnit.MILLISECONDS.sleep(waitTime);
     }
+
+
 
     @Override
     public String toString()
     {
-    	return String.format("Date: %s\n%s Pre Market Open\n%s Regular Market Open\n%s Regular Market Close\n%s Post Market Close", 
-    		date.format(regularMarketOpen.getTime()),
-    		time.format(preMarketOpen.getTime()),
-    		time.format(regularMarketOpen.getTime()),
-    		time.format(regularMarketClose.getTime()),
-    		time.format(extendedHoursClose.getTime()));
+    	return "";
     }
 
-    public static Market waitUntilOpen()
-    {
-        Market market = TDARequest.marketHours();
-        while(market == null) {
-            System.out.println("Waiting for market to open");
-            Util.pause(60);
-            market = TDARequest.marketHours();
-        }
 
-        while(!market.isOpen(false, true)) {
-            System.out.println("Waiting for main market to open ...");
-            Util.pause(20);
-        }
-        return market;
-    }
 }

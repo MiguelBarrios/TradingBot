@@ -30,20 +30,6 @@ public class TDARequest
 		return null;
 	}
 
-	public static Market marketHours()
-	{
-		int month = ZonedDateTime.now().getDayOfMonth();
-		int day = ZonedDateTime.now().getMonthValue();
-		int year = ZonedDateTime.now().getYear();
-
-		String request =  String.format("https://api.tdameritrade.com/v1/marketdata/EQUITY/hours?apikey=%s&date=%4d-%02d-%02d",
-				Config.apiKey, year, day, month);
-
-		String response = Client.sendRequest(request);
-
-		return Parser.parseMarketHours(response);
-	}
-
 	public static String getAccountInfo()
 	{
 		String urlString = String.format("https://api.tdameritrade.com/v1/accounts/%s", Config.accountID);

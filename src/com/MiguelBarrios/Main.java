@@ -1,12 +1,14 @@
 package com.MiguelBarrios;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Main
 {
     public static int NUM_SHARES = 1;
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws InterruptedException
     {
+
 
 
         /*
