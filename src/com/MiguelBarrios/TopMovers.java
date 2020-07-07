@@ -14,12 +14,12 @@ public class TopMovers extends TradingStrategy
         ArrayList<String> trendingUp = new ArrayList<>(20);
 
         //get symbols that we have not see before
-        String[] movers = TDARequest.allTopMovers("up");
+        ArrayList<Mover> movers = TDARequest.allTopMovers("up");
 
-        if(movers.length != 0) {
-            for(String symbol : movers) {
-                if(!trader.hasEncountered(symbol)) {
-                    trendingUp.add(symbol);
+        if(movers.size() != 0) {
+            for(Mover symbol : movers) {
+                if(!trader.hasEncountered(symbol.getSymbol())) {
+                    trendingUp.add(symbol.getSymbol());
                 }
 
             }

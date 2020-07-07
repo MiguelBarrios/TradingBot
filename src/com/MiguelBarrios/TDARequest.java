@@ -124,7 +124,7 @@ public class TDARequest
 	}
 
 	//Complete
-	public static String[] topMovers(Exchange exchange, String direction)
+	public static ArrayList<Mover> topMovers(Exchange exchange, String direction)
 	{
 		String url = String.format("https://api.tdameritrade.com/v1/marketdata/%s/movers?direction=%s&change=percent",
 				exchange, direction);
@@ -134,31 +134,12 @@ public class TDARequest
 		return Parser.parseMovers(response);
 	}
 
-	public static String[] allTopMovers(String direction)
+	public static ArrayList<Mover> allTopMovers(String direction)
 	{
-		String[] smp = topMovers(Exchange.SMP, direction);
-		String[] dow = topMovers(Exchange.DOW, direction);
-		String[] nasdaq = topMovers(Exchange.NASDAQ, direction);
+		ArrayList<Mover> movers = topMovers(Exchange.SMP, direction);
+		movers.addAll(topMovers(Exchange.NASDAQ, direction));
 
-		String[] combined = new String[smp.length + dow.length + nasdaq.length];
-
-		int index = 0;
-		for(String cur : smp) {
-			combined[index] = cur;
-			++index;
-		}
-
-		for(String cur : dow) {
-			combined[index] = cur;
-			++index;
-		}
-
-		for(String cur : nasdaq) {
-			combined[index] = cur;
-			++index;
-		}
-
-		return combined;
+		return movers;
 	}
 
 	//Need to update refresh token july 24
@@ -172,7 +153,8 @@ public class TDARequest
 		String response = Client.sendRequestPost(urlString, post_data);
 
 		String authToken = Parser.parsAuthToken(response);
-		System.out.println(authToken);
 		Config.updateAuthToken(authToken);
+
+		System.out.println("AuthToken refreshed: " + authToken);
 	}
 }

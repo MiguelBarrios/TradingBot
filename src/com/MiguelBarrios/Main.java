@@ -1,29 +1,51 @@
 package com.MiguelBarrios;
-import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class Main
 {
-    public static void main(String[] args) throws IOException
+    public static int NUM_SHARES = 1;
+
+    public static void main(String[] args)
     {
-        Market market = Market.waitUntilOpen();
 
-        //Get authentication token
+
+        /*
         TDARequest.refreshAuthToken();
-        long startTime = System.currentTimeMillis();
+        TDARequest.setSimulation(true);
+        Log log = new Log("/Users/miguelbarrios/Documents/Projects/Logs/TopMovers");
 
-        TradingStrategy gainers = new TopGainers();
-        gainers.start();
+        HashSet<String> encountered = new HashSet<>();
+        ArrayList<Mover> trendingUp =  TDARequest.allTopMovers("up");
 
-        //Check to see if we need to refresh auth Token
-        while(market.isOpen()) {
-            if((System.currentTimeMillis() - startTime) > 1500000) {
-                startTime = System.currentTimeMillis();
-                TDARequest.refreshAuthToken();
+
+        //Find which stocks we have not encountered
+        ArrayList<String> notEncountered = new ArrayList<>();
+        for(Mover mover : trendingUp)
+        {
+            String symbol = mover.getSymbol();
+            if(encountered.add(symbol))
+            {
+                notEncountered.add(symbol);
             }
-            Util.pause(120);
         }
+
+        //Buy Equity we have not encountered
+        for(String tickerSymbol : notEncountered)
+        {
+            Trade trade = TDARequest.placeOrder(tickerSymbol, OrderType.BUY, NUM_SHARES);
+            if(trade == null)
+            {
+                System.out.println("Order not placed");
+            }
+            else
+            {
+                log.saveTrade(trade);
+            }
+        }
+
+
+         */
+
     }
 
 }

@@ -56,28 +56,31 @@ public class Parser
     }
 
 
-    public static String[] parseMovers(String response)
+    public static ArrayList<Mover> parseMovers(String response)
     {
-        JSONArray arr;
+        ArrayList<Mover> movers;
         try{
-            arr = new JSONArray(response);
+            JSONArray arr = new JSONArray(response);
+            movers = new ArrayList<>(arr.length());
+
+            for(int i = 0; i < arr.length(); ++i)
+            {
+                JSONObject mover = arr.getJSONObject(i);
+                double change = mover.getDouble("change");
+                String direction = mover.getString("direction");
+                double last = mover.getDouble("last");
+                String symbol = mover.getString("symbol");
+                int totalVolume = mover.getInt("totalVolume");
+                movers.add(new Mover(change, direction, last, symbol, totalVolume));
+            }
+
+            return movers;
+
         }catch (Exception e)
         {
-            String[] tmp = new String[0];
-            return tmp;
+            System.out.println("ErrorParsing Movers");
+            return new ArrayList<>(0);
         }
-
-        String[] symbols = new String[arr.length()];
-
-        for(int i = 0; i < arr.length(); ++i)
-        {
-            JSONObject object = arr.getJSONObject(i);
-            double change = object.getDouble("change");
-            String symbol = object.getString("symbol");
-            symbols[i] = symbol;
-        }
-
-        return symbols;
     }
 
     public static Quote parseQuote(JSONObject response, String symbol)

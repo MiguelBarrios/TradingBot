@@ -13,6 +13,9 @@ public class Client
 {
     private static final HttpClient client = HttpClient.newHttpClient();
 
+    public static long lastAuthRefreshTime = -1;
+
+
     public static String sendRequest(String requestType)
     {
         try{
@@ -40,7 +43,6 @@ public class Client
             String auth = String.format("Bearer %s", Config.getAuthToken());
             httpURLConnection.setRequestProperty("Authorization", auth);
 
-
             String line = "";
             InputStreamReader inputStreamReader = new InputStreamReader(httpURLConnection.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -51,13 +53,11 @@ public class Client
             }
 
             bufferedReader.close();
-
             return response.toString();
         }
         catch (Exception e)
         {
             System.out.println("Error getting request");
-
             e.printStackTrace();
         }
 
@@ -89,7 +89,7 @@ public class Client
 
     public static String placeOrder(String post_data)
     {
-        String urlString = "https://api.tdameritrade.com/v1/accounts/" + Config.accountID + "/orders";
+        String urlString = String.format("https://api.tdameritrade.com/v1/accounts/%s/orders", Config.accountID);
 
         try{
             URL url = new URL(urlString);
@@ -134,6 +134,8 @@ public class Client
         }
         catch (Exception e)
         {
+            System.out.println("Error in client");
+            e.printStackTrace();
             return "";
         }
     }
