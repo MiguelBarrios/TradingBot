@@ -9,44 +9,52 @@ public class Main
     public static void main(String[] args) throws InterruptedException
     {
 
+        Date open = new Date(2020, Calendar.JULY, 9, 8, 30);
+        Date close = new Date(2020, Calendar.JULY, 9, 14, 55);
+        Market market = new Market(open, close);
 
 
-        /*
+        //market.waitForMarketToOpen();
         TDARequest.refreshAuthToken();
         TDARequest.setSimulation(true);
-        Log log = new Log("/Users/miguelbarrios/Documents/Projects/Logs/TopMovers");
+        Log log = new Log("TopMovers");
 
-        HashSet<String> encountered = new HashSet<>();
-        ArrayList<Mover> trendingUp =  TDARequest.allTopMovers("up");
+        //For this strategy we will only purchase each equity once
+        HashSet<String> previouslyEncountered = new HashSet<>();
 
-
-        //Find which stocks we have not encountered
-        ArrayList<String> notEncountered = new ArrayList<>();
-        for(Mover mover : trendingUp)
+        while(true)//market.isOpen())
         {
-            String symbol = mover.getSymbol();
-            if(encountered.add(symbol))
+            ArrayList<Mover> topGainers =  TDARequest.allTopMovers("up");
+
+            //Purchase stocks that we have not encountered
+            for(Mover mover : topGainers)
             {
-                notEncountered.add(symbol);
+                String tickerSymbol = mover.getSymbol();
+                if(previouslyEncountered.add(tickerSymbol))
+                {
+                    Trade trade = TDARequest.placeOrder(tickerSymbol, OrderType.BUY, NUM_SHARES);
+                    if(trade == null) {
+                        System.out.println("Order not placed");
+                    }
+                    else {
+                        log.saveTrade(trade);
+                    }
+                }
             }
+
+
+
+            break;
         }
 
-        //Buy Equity we have not encountered
-        for(String tickerSymbol : notEncountered)
-        {
-            Trade trade = TDARequest.placeOrder(tickerSymbol, OrderType.BUY, NUM_SHARES);
-            if(trade == null)
-            {
-                System.out.println("Order not placed");
-            }
-            else
-            {
-                log.saveTrade(trade);
-            }
-        }
 
 
-         */
+
+
+
+
+
+
 
     }
 

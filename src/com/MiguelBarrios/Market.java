@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Market
 {
-    public static SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
     public static SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
     public static SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
@@ -22,20 +22,30 @@ public class Market
     {
         this.startTrading = startTrading.getTime();
         this.stopTrading = stopTrading.getTime();
+        System.out.println("Trading session");
+        System.out.println(startTrading + " -> " + stopTrading);
+
     }
 
     public boolean isOpen()
     {
-        long now = System.currentTimeMillis();
+        Date cur = new Date();
+        cur.setYear(2020);
+        long now = cur.getTime();
+        System.out.println("Waiting for: " + time.format(now));
     	return (now > startTrading) && (now < stopTrading);
 
     }
 
     public void waitForMarketToOpen() throws InterruptedException
     {
-        long now = System.currentTimeMillis();
-        long waitTime = startTrading - now;
-        System.out.println("Waiting: " + time.format(waitTime));
+        Date now = new Date();
+        now.setYear(2020);
+
+
+
+        long waitTime = startTrading - now.getTime();
+        System.out.println("Waiting for:  " + waitTime);
         TimeUnit.MILLISECONDS.sleep(waitTime);
     }
 
