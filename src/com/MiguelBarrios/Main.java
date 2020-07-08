@@ -14,14 +14,12 @@ public class Main
         Market market = new Market(open, close);
 
 
-
-
-
         //market.waitForMarketToOpen();
         TDARequest.refreshAuthToken();
         TDARequest.setSimulation(true);
-        AccountSummary accountSummary = TDARequest.getAccountInfo();
-        System.out.println(accountSummary);
+
+        Account account = new Account();
+        System.out.println(account);
 
 
         System.exit(-1);

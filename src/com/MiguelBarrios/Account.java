@@ -1,10 +1,11 @@
 package com.MiguelBarrios;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Account
 {
-    private HashMap<String,Trade> activePositions;
+    private ArrayList<Position> activePositions;
 
     private double initialBalance;
 
@@ -15,6 +16,11 @@ public class Account
     private double accountValue;
 
     public Account()
+    {
+        updateAccountInfo();
+    }
+
+    public void updateAccountInfo()
     {
         AccountSummary summary = TDARequest.getAccountInfo();
         this.initialBalance = summary.initialBalance;
@@ -33,8 +39,10 @@ public class Account
         sb.append(", buyingPower=").append(buyingPower);
         sb.append(", accountValue=").append(accountValue).append("}\n");
 
-        for(String key : activePositions.keySet())
-            sb.append(key).append(", ");
+        for(Position pos : activePositions)
+        {
+            sb.append(pos.toString()).append("\n");
+        }
 
         return sb.toString();
     }

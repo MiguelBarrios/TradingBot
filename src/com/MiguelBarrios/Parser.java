@@ -117,19 +117,34 @@ public class Parser
 
         //Get active Positions
         JSONArray activePositions = securitiesAccount.getJSONArray("positions");
-        HashMap<String, Trade> positions = new HashMap<>();
+        ArrayList<Position> positions = new ArrayList<>();
         for(int i = 0;  i < activePositions.length(); ++i)
         {
-            JSONObject position = activePositions.getJSONObject(i);
-            double shortQuantity = position.getDouble("shortQuantity");
-            double longQuantity = position.getDouble("longQuantity");
-            double averagePrice = position.getDouble("averagePrice");
-            JSONObject instrument = position.getJSONObject("instrument");
-            String symbol = instrument.getString("symbol");
-            double marketValue = position.getDouble("marketValue");
+            JSONObject str = activePositions.getJSONObject(i);
+            /*
+            String[] arr = str.toString().split(",");
+            for(String cur : arr)
+            {
+                System.out.println(cur);
+            }
+             */
 
-            Trade trade = new Trade(OrderType.SELL_SHORT,(int)longQuantity,averagePrice,symbol);
-            positions.put(symbol, trade);
+            double currentDayProfitLoss = str.getDouble("currentDayProfitLoss");
+            int longQuantity = str.getInt("longQuantity");
+            double currentDayProfitLossPercentage = str.getDouble("currentDayProfitLossPercentage");
+            int settledLongQuantity = str.getInt("settledLongQuantity");
+            double marketValue = str.getDouble("marketValue");
+
+            JSONObject instrument = str.getJSONObject("instrument");
+            String symbol = instrument.getString("symbol");
+            String cusip = instrument.getString("cusip");
+            double averagePrice = str.getDouble("averagePrice");
+
+            int settledShortQuantity = str.getInt("settledShortQuantity");
+            int shortQuantity = str.getInt("shortQuantity");
+
+            Position position = new Position(symbol, cusip, currentDayProfitLoss,currentDayProfitLossPercentage, longQuantity, settledLongQuantity, settledShortQuantity, shortQuantity, marketValue, averagePrice);
+            positions.add(position);
         }
         return new AccountSummary(accountValue, availableFunds, buyingPower, accountValue, positions);
     }
