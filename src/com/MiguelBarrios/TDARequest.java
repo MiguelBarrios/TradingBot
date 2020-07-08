@@ -141,7 +141,5 @@ public class TDARequest
 
 		String authToken = Parser.parsAuthToken(response);
 		Config.updateAuthToken(authToken);
-
-		System.out.println("AuthToken refreshed: " + authToken);
 	}
 }

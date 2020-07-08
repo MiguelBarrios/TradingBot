@@ -109,7 +109,6 @@ public class Parser
         JSONObject securitiesAccount = json.getJSONObject("securitiesAccount");
         JSONObject initialBalances = securitiesAccount.getJSONObject("initialBalances");
         JSONObject currentBalances = securitiesAccount.getJSONObject("currentBalances");
-        System.out.println(currentBalances);
 
         double accountValue = initialBalances.getDouble("accountValue");
         double availableFunds = currentBalances.getDouble("availableFunds");

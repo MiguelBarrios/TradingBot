@@ -42,7 +42,7 @@ public class TopMoversStats extends Statistics
 
         percentChange = 0;
 
-        shortPosition = (type == OrderType.SHORT);
+        shortPosition = (type == OrderType.SELL_SHORT);
 
         int isShort = (shortPosition) ? 1 : -1;
 

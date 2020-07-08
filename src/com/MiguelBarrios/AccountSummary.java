@@ -22,4 +22,24 @@ public class AccountSummary
         this.accountValue = accountValue;
         this.activePositions = activePositions;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("AvailableFunds = %f BuyingPower = %f AccountValue = %f initialBalance = %f NumPositions = %d\n%s", availableFunds, buyingPower, accountValue, initialBalance, activePositions.size(), positionsString());
+    }
+
+    public String positionsString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Positions{");
+        for(String key : activePositions.keySet())
+        {
+            Trade trade = activePositions.get(key);
+            sb.append(trade.toString()).append(", ");
+        }
+        sb.append("}");
+
+        return sb.toString();
+    }
 }

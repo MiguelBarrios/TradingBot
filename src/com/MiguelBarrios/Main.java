@@ -14,15 +14,26 @@ public class Main
         Market market = new Market(open, close);
 
 
+
+
+
         //market.waitForMarketToOpen();
         TDARequest.refreshAuthToken();
         TDARequest.setSimulation(true);
+        AccountSummary accountSummary = TDARequest.getAccountInfo();
+        System.out.println(accountSummary);
+
+
+        System.exit(-1);
+
+
+
         Log log = new Log("TopMovers");
 
         //For this strategy we will only purchase each equity once
         HashSet<String> previouslyEncountered = new HashSet<>();
 
-        while(true)//market.isOpen())
+        while(market.isOpen())
         {
             ArrayList<Mover> topGainers =  TDARequest.allTopMovers("up");
 
@@ -42,9 +53,6 @@ public class Main
                 }
             }
 
-
-
-            break;
         }
 
 

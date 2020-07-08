@@ -5,7 +5,9 @@ public enum OrderType
     BUY("Buy"),
     SELL("Sell"),
     HOLD("HOLD"),
-    SHORT("SHORT");
+    //When wanting to enter and exit a short position
+    SELL_SHORT("SELL_SHORT"),
+    BUY_TO_COVER("BUY_TO_COVER");
 
     private String type;
 
