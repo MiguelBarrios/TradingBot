@@ -30,10 +30,11 @@ public class TDARequest
 		return null;
 	}
 
-	public static String getAccountInfo()
+	public static AccountSummary getAccountInfo()
 	{
-		String urlString = String.format("https://api.tdameritrade.com/v1/accounts/%s", Config.accountID);
-		return Client.sendRequestGet(urlString);
+		String urlString = String.format("https://api.tdameritrade.com/v1/accounts/%s?fields=positions,orders", Config.accountID);
+		String response = Client.sendRequestGet(urlString);
+		return Parser.parseAccountInfo(response);
 	}
 
 	public static Quote getQuote(String symbol)

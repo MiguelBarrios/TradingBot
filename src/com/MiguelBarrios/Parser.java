@@ -7,6 +7,7 @@ import javax.xml.bind.SchemaOutputResolver;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 public class Parser
 {
@@ -101,6 +102,39 @@ public class Parser
 
         return quotes;
     }
+
+    public static AccountSummary parseAccountInfo(String responseString)
+    {
+        JSONObject json = new JSONObject(responseString);
+        JSONObject securitiesAccount = json.getJSONObject("securitiesAccount");
+        JSONObject initialBalances = securitiesAccount.getJSONObject("initialBalances");
+        JSONObject currentBalances = securitiesAccount.getJSONObject("currentBalances");
+        System.out.println(currentBalances);
+
+        double accountValue = initialBalances.getDouble("accountValue");
+        double availableFunds = currentBalances.getDouble("availableFunds");
+        double buyingPower =  currentBalances.getDouble("buyingPower");
+
+
+        //Get active Positions
+        JSONArray activePositions = securitiesAccount.getJSONArray("positions");
+        HashMap<String, Trade> positions = new HashMap<>();
+        for(int i = 0;  i < activePositions.length(); ++i)
+        {
+            JSONObject position = activePositions.getJSONObject(i);
+            double shortQuantity = position.getDouble("shortQuantity");
+            double longQuantity = position.getDouble("longQuantity");
+            double averagePrice = position.getDouble("averagePrice");
+            JSONObject instrument = position.getJSONObject("instrument");
+            String symbol = instrument.getString("symbol");
+            double marketValue = position.getDouble("marketValue");
+
+            Trade trade = new Trade(OrderType.SELL_SHORT,(int)longQuantity,averagePrice,symbol);
+            positions.put(symbol, trade);
+        }
+        return new AccountSummary(accountValue, availableFunds, buyingPower, accountValue, positions);
+    }
+
 
 }
 
