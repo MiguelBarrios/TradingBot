@@ -1,7 +1,5 @@
 package com.MiguelBarrios;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Account
 {
@@ -28,6 +26,31 @@ public class Account
         this.buyingPower = summary.buyingPower;
         this.accountValue = summary.accountValue;
         activePositions = summary.activePositions;
+    }
+
+    public ArrayList<Position> getActivePositions()
+    {
+        return activePositions;
+    }
+
+    public double getInitialBalance()
+    {
+        return initialBalance;
+    }
+
+    public double getAvailableFunds()
+    {
+        return availableFunds;
+    }
+
+    public double getBuyingPower()
+    {
+        return buyingPower;
+    }
+
+    public double getAccountValue()
+    {
+        return accountValue;
     }
 
     @Override

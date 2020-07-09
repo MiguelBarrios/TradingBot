@@ -1,16 +1,49 @@
 package com.MiguelBarrios;
 
-public abstract class Statistics
+public class Statistics
 {
-    public abstract OrderType update(double price);
+    private double maxChange;
 
-    public abstract double getPercentChange();
+    private double minChange;
 
-    public abstract double getAbsoluteMax();
+    private boolean shortPosition;
 
-    public abstract double getAbsoluteMin();
+    public Statistics(boolean isShortPosition)
+    {
+        maxChange = 0;
+        minChange = 0;
+        shortPosition = isShortPosition;
+    }
 
-    public abstract double getCurrentPrice();
+    public OrderType update(double change)
+    {
+        //TODO: implement
+        OrderType orderType = OrderType.HOLD;
+        if(shortPosition)
+        {
+           // double changeFromMin = (minChange + change);
+        }
+        else
+        {
+            /*
+            double changeFromMax =  (maxChange - change);
+            if(changeFromMax < -1)
+            {
+                orderType = OrderType.SELL;
+            }
 
-    public abstract double getInitialPrice();
+             */
+        }
+
+
+        if(change > maxChange)
+            minChange = change;
+
+        if(change < minChange)
+            minChange = change;
+
+
+        return orderType;
+
+    }
 }

@@ -63,7 +63,7 @@ public class Position
         return currentDayProfitLoss;
     }
 
-    public double getGetCurrentDayProfitLossPercentage()
+    public double getcurrentDayProfitLossPercentage()
     {
         return currentDayProfitLossPercentage;
     }

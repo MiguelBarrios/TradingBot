@@ -13,17 +13,11 @@ public class Main
         Date close = new Date(2020, Calendar.JULY, 9, 14, 55);
         Market market = new Market(open, close);
 
-
         //market.waitForMarketToOpen();
         TDARequest.refreshAuthToken();
         TDARequest.setSimulation(true);
 
         Account account = new Account();
-        System.out.println(account);
-
-
-        System.exit(-1);
-
 
 
         Log log = new Log("TopMovers");
@@ -35,8 +29,7 @@ public class Main
         {
             ArrayList<Mover> topGainers =  TDARequest.allTopMovers("up");
 
-            //Purchase stocks that we have not encountered
-            for(Mover mover : topGainers)
+            for(Mover mover : topGainers) //Purchase stocks that we have not encountered
             {
                 String tickerSymbol = mover.getSymbol();
                 if(previouslyEncountered.add(tickerSymbol))
@@ -51,17 +44,25 @@ public class Main
                 }
             }
 
+            //Get updated account info
+            account.updateAccountInfo();
+
+            ArrayList<Position> positions = account.getActivePositions();
+
+            for(Position position : positions)
+            {
+                double change = position.getcurrentDayProfitLossPercentage();
+                if(change < -1)
+                {
+                    System.out.println("sell: " + position.getSymbol());
+                }
+            }
+
+            //TODO: implement sell logic buy using account position profitlosschange
+
+            //Inorder to avoid 429 error
+            TimeUnit.SECONDS.sleep(1);
         }
-
-
-
-
-
-
-
-
-
-
     }
 
 }
