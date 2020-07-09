@@ -17,17 +17,19 @@ public class Main
         TDARequest.refreshAuthToken();
         TDARequest.setSimulation(true);
 
-        Account account = new Account();
-
+       // Account account = new Account();
+        /*
 
         Log log = new Log("TopMovers");
 
         //For this strategy we will only purchase each equity once
         HashSet<String> previouslyEncountered = new HashSet<>();
 
-        while(market.isOpen())
+        while(true)//market.isOpen())
         {
+            System.out.println("Getting top movers");
             ArrayList<Mover> topGainers =  TDARequest.allTopMovers("up");
+
 
             for(Mover mover : topGainers) //Purchase stocks that we have not encountered
             {
@@ -44,9 +46,13 @@ public class Main
                 }
             }
 
+
+
+
+
             //Get updated account info
             account.updateAccountInfo();
-
+            System.out.println(account);
             ArrayList<Position> positions = account.getActivePositions();
 
             for(Position position : positions)
@@ -61,8 +67,10 @@ public class Main
             //TODO: implement sell logic buy using account position profitlosschange
 
             //Inorder to avoid 429 error
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.SECONDS.sleep(30);
         }
+
+        */
     }
 
 }

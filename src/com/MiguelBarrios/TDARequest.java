@@ -140,6 +140,7 @@ public class TDARequest
 		String response = Client.sendRequestPost(urlString, post_data);
 
 		String authToken = Parser.parsAuthToken(response);
+		System.out.println(authToken);
 		Config.updateAuthToken(authToken);
 	}
 }

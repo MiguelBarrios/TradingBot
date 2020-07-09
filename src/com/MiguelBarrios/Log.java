@@ -62,17 +62,7 @@ public class Log
 
     }
 
-    public void saveOrder(Order order)
-    {
-        try{
-            FileWriter outputfile = new FileWriter(ordersFile, true);
-            CSVWriter writer = new CSVWriter(outputfile);
-            writer.writeNext(order.cvsFormat());
-            writer.close();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-    }
+
 
     public void saveTrade(Trade trade)
     {

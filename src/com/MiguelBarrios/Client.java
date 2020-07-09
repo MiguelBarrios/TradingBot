@@ -8,35 +8,18 @@ import java.io.BufferedReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class Client
 {
     private static final HttpClient client = HttpClient.newHttpClient();
 
-    public static long lastAuthRefreshTime = -1;
-
-
-    public static String sendRequest(String requestType)
-    {
-        try{
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(requestType))
-                    .build();
-
-            return client.send(request, HttpResponse.BodyHandlers.ofString()).body();
-        }
-        catch (Exception e)
-        {
-            System.out.println("Error: Sending request");
-            return "";
-        }
-    }
-
     public static String sendRequestGet(String urlString)
     {
         try{
             URL url = new URL(urlString);
-            HttpsURLConnection httpURLConnection = (HttpsURLConnection)url.openConnection();
+            HttpsURLConnection httpURLConnection;
+            httpURLConnection = (HttpsURLConnection)url.openConnection();
             httpURLConnection.setRequestMethod("GET");
 
             //Add header
@@ -68,7 +51,6 @@ public class Client
     {
         try{
             URL url = new URL(urlString);
-
             HttpsURLConnection httpURLConnection = (HttpsURLConnection)url.openConnection();
             httpURLConnection.setRequestMethod("POST");
             httpURLConnection.setDoOutput(true);
@@ -83,6 +65,8 @@ public class Client
         catch (Exception e)
         {
             System.out.println("Error getting request");
+            e.printStackTrace();
+            System.out.println("\n\n");
             return "";
         }
     }
@@ -134,7 +118,7 @@ public class Client
         }
         catch (Exception e)
         {
-            System.out.println("Error in client");
+            System.out.println("Error reading Response");
             e.printStackTrace();
             return "";
         }
