@@ -1,5 +1,7 @@
 package com.MiguelBarrios;
 
+import java.text.SimpleDateFormat;
+
 public class Mover
 {
     private double change;
@@ -12,6 +14,8 @@ public class Mover
 
     private int totalVolume;
 
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z");
+
     public Mover(double change, String direction, double last, String symbol, int totalVolume)
     {
         this.change = change;
@@ -19,6 +23,24 @@ public class Mover
         this.last = last;
         this.symbol = symbol;
         this.totalVolume = totalVolume;
+    }
+
+    public String[] csvFormat()
+    {
+        //{"Symbol", "lastPrice", "Direction", "Change", "Volume", "Time"};
+        long now = System.currentTimeMillis();
+
+
+
+        String[] arr = {symbol,
+                        String.valueOf(getLast()),
+                        direction,
+                        String.valueOf(change),
+                        String.valueOf(totalVolume),
+                        sdf.format(now)};
+
+
+        return arr;
     }
 
     public double getChange()

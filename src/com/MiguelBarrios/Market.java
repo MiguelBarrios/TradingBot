@@ -41,15 +41,14 @@ public class Market
     {
         Date now = new Date();
         now.setYear(2020);
-
-
-
         long waitTime = startTrading - now.getTime();
         System.out.println("Waiting for:  " + waitTime);
         TimeUnit.MILLISECONDS.sleep(waitTime);
+
+
+        Clock clock = new Clock(this);
+        clock.start();
     }
-
-
 
     @Override
     public String toString()

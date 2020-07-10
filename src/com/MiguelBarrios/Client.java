@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 
-
 public class Client
 {
     private static final HttpClient client = HttpClient.newHttpClient();

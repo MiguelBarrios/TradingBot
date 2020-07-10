@@ -110,21 +110,27 @@ public class TDARequest
 		return quotes;
 	}
 
-	//Complete
-	public static ArrayList<Mover> topMovers(Exchange exchange, String direction)
+	/**
+	 *
+	 * @param exchange
+	 * @param direction
+	 * @param change can be "percent" or "value"
+	 * @return
+	 */
+	public static ArrayList<Mover> topMovers(Exchange exchange, String direction, String change)
 	{
-		String url = String.format("https://api.tdameritrade.com/v1/marketdata/%s/movers?direction=%s&change=percent",
-				exchange, direction);
+		String url = String.format("https://api.tdameritrade.com/v1/marketdata/%s/movers?direction=%s&change=%s",
+				exchange, direction, change);
 
 		String response = Client.sendRequestGet(url);
 
 		return Parser.parseMovers(response);
 	}
 
-	public static ArrayList<Mover> allTopMovers(String direction)
+	public static ArrayList<Mover> allTopMovers(String direction, String change)
 	{
-		ArrayList<Mover> movers = topMovers(Exchange.SMP, direction);
-		movers.addAll(topMovers(Exchange.NASDAQ, direction));
+		ArrayList<Mover> movers = topMovers(Exchange.SMP, direction, change);
+		movers.addAll(topMovers(Exchange.NASDAQ, direction, change));
 
 		return movers;
 	}

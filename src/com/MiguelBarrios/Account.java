@@ -16,6 +16,7 @@ public class Account
     public Account()
     {
         updateAccountInfo();
+        new Log("TopMovers");
     }
 
     public void updateAccountInfo()

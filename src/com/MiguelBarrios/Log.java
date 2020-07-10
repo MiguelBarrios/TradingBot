@@ -14,9 +14,9 @@ public class Log
     public static final SimpleDateFormat yearMonthDay = new SimpleDateFormat("yyyy-MM-dd");
     private static final String mainDirectory = "/Users/miguelbarrios/Documents/Projects/Logs/";
 
-    private File quotesFile;
-    private File tradesFile;
-    private File ordersFile;
+    private static File quotesFile;
+    private static  File tradesFile;
+    private static File moversFile;
 
     public Log(String directory)
     {
@@ -25,13 +25,15 @@ public class Log
         String[] tradesHeader = {"Trade Type", "Symbol", "amount", "Idv Price", "Total  Price", "TOE"};
         addHeader(tradesFile, tradesHeader);
 
-        ordersFile = mkdir(directory + "/Orders");
-        String[] orderHeader = {"Symbol", "Price Bought", "Price Sold","Profit", "Change", "Max", "Min", "Time Bought", "Time Sold"};
-        addHeader(ordersFile, orderHeader);
 
         quotesFile = mkdir(directory + "/Quotes");
         String[] quotesHeader = {"SYMBOL", "BID_PRICE", "BID_SIZE", "ASK_PRICE", "ASK_SIZE", "NET_CHANGE", "VOLUME", "SHORTABLE", "VOLITILITY", "CHANGE", "TIME"};
         addHeader(quotesFile, quotesHeader);
+
+
+        moversFile =  mkdir(directory + "/Movers");
+        String[] moversHeader = {"Symbol", "lastPrice", "Direction", "Change", "Volume", "Time"};
+        addHeader(moversFile, moversHeader);
     }
 
     private File mkdir(String directory)
@@ -64,7 +66,7 @@ public class Log
 
 
 
-    public void saveTrade(Trade trade)
+    public static void saveTrade(Trade trade)
     {
         try{
             FileWriter outputfile = new FileWriter(tradesFile, true);
@@ -78,7 +80,7 @@ public class Log
         }
     }
 
-    public void saveQuotes(ArrayList<Quote> quotes)
+    public static void saveQuotes(ArrayList<Quote> quotes)
     {
         try {
             FileWriter outputFile = new FileWriter(quotesFile, true);
@@ -95,4 +97,21 @@ public class Log
         }
 
     }
+
+    public static void saveMover(Mover mover)
+    {
+        try {
+            FileWriter outputFile = new FileWriter(moversFile, true);
+            CSVWriter writer = new CSVWriter(outputFile);
+
+            writer.writeNext(mover.csvFormat());
+
+
+            writer.close();
+        }
+        catch (Exception e) {
+            //DO NOTHING
+        }
+    }
+
 }
