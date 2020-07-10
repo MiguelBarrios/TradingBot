@@ -1,4 +1,8 @@
 package com.MiguelBarrios;
+import com.google.common.net.MediaType;
+import com.twilio.http.Request;
+import com.twilio.http.Response;
+
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -6,16 +10,25 @@ public class Main
 {
     public static int NUM_SHARES = 1;
 
+
     public static void main(String[] args) throws InterruptedException
     {
-
+        TDARequest.refreshAuthToken();
+        ArrayList<Mover> trendingUp = TDARequest.topMovers(Exchange.NASDAQ, "up");
+        System.out.println(trendingUp.size());
+        for(Mover mover : trendingUp)
+        {
+            System.out.println(mover);
+        }
+        /*
         Date open = new Date(2020, Calendar.JULY, 9, 8, 30);
         Date close = new Date(2020, Calendar.JULY, 9, 14, 55);
         Market market = new Market(open, close);
+         */
 
         //market.waitForMarketToOpen();
-        TDARequest.refreshAuthToken();
-        TDARequest.setSimulation(true);
+       // TDARequest.refreshAuthToken();
+        //TDARequest.setSimulation(true);
 
        // Account account = new Account();
         /*

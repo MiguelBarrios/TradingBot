@@ -8,11 +8,27 @@ import java.io.BufferedReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
+
 
 public class Client
 {
     private static final HttpClient client = HttpClient.newHttpClient();
+
+    public static String sendRequest(String requestType)
+    {
+        try{
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(requestType))
+                    .build();
+
+            return client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error: Sending request");
+            return "";
+        }
+    }
 
     public static String sendRequestGet(String urlString)
     {
@@ -47,29 +63,7 @@ public class Client
         return null;
     }
 
-    public static String sendRequestPost(String urlString, String post_data)
-    {
-        try{
-            URL url = new URL(urlString);
-            HttpsURLConnection httpURLConnection = (HttpsURLConnection)url.openConnection();
-            httpURLConnection.setRequestMethod("POST");
-            httpURLConnection.setDoOutput(true);
 
-            OutputStream outputStream = httpURLConnection.getOutputStream();
-            outputStream.write(post_data.getBytes());
-            outputStream.flush();
-            outputStream.close();
-
-            return readResponse(httpURLConnection);
-        }
-        catch (Exception e)
-        {
-            System.out.println("Error getting request");
-            e.printStackTrace();
-            System.out.println("\n\n");
-            return "";
-        }
-    }
 
     public static String placeOrder(String post_data)
     {
@@ -101,6 +95,30 @@ public class Client
         }
     }
 
+    public static String sendRequestPost(String urlString, String post_data)
+    {
+        try{
+            URL url = new URL(urlString);
+
+            HttpsURLConnection httpURLConnection = (HttpsURLConnection)url.openConnection();
+            httpURLConnection.setRequestMethod("POST");
+            httpURLConnection.setDoOutput(true);
+
+            OutputStream outputStream = httpURLConnection.getOutputStream();
+            outputStream.write(post_data.getBytes());
+            outputStream.flush();
+            outputStream.close();
+
+            return readResponse(httpURLConnection);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error getting request");
+            return "";
+        }
+    }
+
+
     private static String readResponse(HttpsURLConnection httpURLConnection)
     {
         try
@@ -118,8 +136,6 @@ public class Client
         }
         catch (Exception e)
         {
-            System.out.println("Error reading Response");
-            e.printStackTrace();
             return "";
         }
     }
