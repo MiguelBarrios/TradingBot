@@ -1,10 +1,8 @@
 package com.MiguelBarrios;
 
+import java.lang.reflect.Array;
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Main
@@ -22,19 +20,23 @@ public class Main
         Account account = new Account();
 
         //For this strategy we will only purchase each equity once
-        HashSet<String> previouslyEncountered = new HashSet<>();
+        HashMap<String, Mover> movers = new HashMap<>();
 
-        while(true)//market.isOpen())
+        while (market.isOpen())
         {
             System.out.println("Getting top movers");
-            ArrayList<Mover> topGainers =  TDARequest.allTopMovers("up", "percent");
-            topGainers.addAll(TDARequest.allTopMovers("up", "value"));
+            ArrayList<Mover> topMovers = TDARequest.allTopMovers("up", "percent");
+            topMovers.addAll(TDARequest.allTopMovers("up", "value"));
+            topMovers.addAll(TDARequest.allTopMovers("down", "percent"));
+            topMovers.addAll(TDARequest.allTopMovers("down", "value"));
 
-            for(Mover mover : topGainers)
+            for (Mover mover : topMovers)
             {
-                if(previouslyEncountered.add(mover.getSymbol()))
+                if(!movers.containsKey(mover.getSymbol()))
+                {
+                    movers.put(mover.getSymbol(), mover);
                     Log.saveMover(mover);
-
+                }
             }
 
 
@@ -76,9 +78,27 @@ public class Main
 
             //TODO: implement sell logic buy using account position profitlosschange
             //Inorder to avoid 429 error
-            TimeUnit.SECONDS.sleep(30);
-
+            TimeUnit.SECONDS.sleep(5);
         }
+
+        //---------------- For testing only ------------------------------------
+        //Get quotes for all stocks that would have been purchased
+        ArrayList<String> symbols = new ArrayList<>(movers.keySet());
+        ArrayList<Quote> quotes = TDARequest.getQuotes(symbols);
+        Log.saveQuotes(quotes);
+
+        //Results  if we close position the same day
+        ArrayList<Results> list = new ArrayList<>();
+        for(Quote quote : quotes)
+        {
+            String symbol = quote.getSymbol();
+            Results results = new Results(movers.get(symbol), quote);
+            list.add(results);
+            System.out.println(results);
+        }
+
+        System.out.println(Results.getTotalProfits());
+        Log.saveResults(list);
     }
 }
 

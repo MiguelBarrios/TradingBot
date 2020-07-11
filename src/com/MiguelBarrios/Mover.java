@@ -4,17 +4,17 @@ import java.text.SimpleDateFormat;
 
 public class Mover
 {
-    private double change;
+    private final double change;
 
-    private String direction;
+    private final String direction;
 
-    private double last;
+    private final double last;
 
-    private String symbol;
+    private final String symbol;
 
-    private int totalVolume;
+    private final int totalVolume;
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z");
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z");
 
     public Mover(double change, String direction, double last, String symbol, int totalVolume)
     {
@@ -38,7 +38,6 @@ public class Mover
                         String.valueOf(change),
                         String.valueOf(totalVolume),
                         sdf.format(now)};
-
 
         return arr;
     }

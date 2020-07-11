@@ -17,6 +17,7 @@ public class Log
     private static File quotesFile;
     private static  File tradesFile;
     private static File moversFile;
+    private static File resultsFile;
 
     public Log(String directory)
     {
@@ -34,6 +35,12 @@ public class Log
         moversFile =  mkdir(directory + "/Movers");
         String[] moversHeader = {"Symbol", "lastPrice", "Direction", "Change", "Volume", "Time"};
         addHeader(moversFile, moversHeader);
+
+        resultsFile =  mkdir(directory + "/Results");
+        String[] resultsSummary = {Results.getTotalProfits()};
+        String[] resultsHeader = {"Symbol", "ShortPosition" ,"BuyPrice", "SellPrice", "profit"};
+        addHeader(resultsFile, resultsSummary);
+        addHeader(resultsFile, resultsHeader);
     }
 
     private File mkdir(String directory)
@@ -51,7 +58,7 @@ public class Log
     {
         try{
             // Ad header to Trades File
-            FileWriter outputfile = new FileWriter(file);
+            FileWriter outputfile = new FileWriter(file, true);
             CSVWriter writer = new CSVWriter(outputfile);
 
             writer.writeNext(header);
@@ -63,8 +70,6 @@ public class Log
         }
 
     }
-
-
 
     public static void saveTrade(Trade trade)
     {
@@ -106,6 +111,24 @@ public class Log
 
             writer.writeNext(mover.csvFormat());
 
+
+            writer.close();
+        }
+        catch (Exception e) {
+            //DO NOTHING
+        }
+    }
+
+    public static void saveResults(ArrayList<Results> results)
+    {
+        try {
+            FileWriter outputFile = new FileWriter(resultsFile, true);
+            CSVWriter writer = new CSVWriter(outputFile);
+
+            for(Results cur : results)
+            {
+                writer.writeNext(cur.csvFormat());
+            }
 
             writer.close();
         }
