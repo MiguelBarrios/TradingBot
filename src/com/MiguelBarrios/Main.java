@@ -1,5 +1,7 @@
 package com.MiguelBarrios;
 
+import jdk.swing.interop.SwingInterOpUtils;
+
 import java.lang.reflect.Array;
 import java.time.Year;
 import java.util.*;
@@ -7,18 +9,19 @@ import java.util.concurrent.TimeUnit;
 
 public class Main
 {
+    public static String split = "########################################\n########################################";
 
     public static void main(String[] args) throws InterruptedException
     {
-        TDARequest.setSimulation(true);
 
-        Date startTrading = new Date(2020, Calendar.JULY, 9, 8, 30);
-        Date stopTrading = new Date(2020, Calendar.JULY, 9, 14, 55);
+        TDARequest.setSimulation(true);
+        Date startTrading = new Date(2020, Calendar.JULY, 15, 8, 30);
+        Date stopTrading = new Date(2020, Calendar.JULY, 15, 14, 55);
         Market market = new Market(startTrading, stopTrading);
         market.waitForMarketToOpen();
-
+        TimeUnit.SECONDS.sleep(10);
         Account account = new Account();
-
+        new Log("TopMovers");
         //For this strategy we will only purchase each equity once
         HashMap<String, Mover> movers = new HashMap<>();
 
@@ -59,8 +62,6 @@ public class Main
                 }
             }
 
-
-
             //Get updated account info
             account.updateAccountInfo();
             System.out.println(account);
@@ -83,8 +84,19 @@ public class Main
 
         //---------------- For testing only ------------------------------------
         //Get quotes for all stocks that would have been purchased
-        ArrayList<String> symbols = new ArrayList<>(movers.keySet());
+        //TODO: why is it adding each symbol twice?
+        System.out.println(split);
+        System.out.println("Mover size: " + movers.size());
+        System.out.println("Movers keyset size: " + movers.keySet().size());
+        ArrayList<String> symbols = new ArrayList<>(movers.size());
+        symbols.addAll(movers.keySet());
+
+        System.out.println("Symbols size: " + symbols.size());
+
+
         ArrayList<Quote> quotes = TDARequest.getQuotes(symbols);
+        System.out.println("quotes.size() = " + quotes.size());
+        System.out.println(split);
         Log.saveQuotes(quotes);
 
         //Results  if we close position the same day
@@ -100,6 +112,8 @@ public class Main
         System.out.println(Results.getTotalProfits());
         Log.saveResults(list);
     }
+
+
 }
 
 

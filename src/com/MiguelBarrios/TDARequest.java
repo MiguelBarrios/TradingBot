@@ -12,7 +12,16 @@ public class TDARequest
 		TDARequest.simulation = simulation;
 	}
 
-	public static Trade placeOrder(String symbol, OrderType type, int numShares)
+	public static void placeLimitOrder(String symbol, OrderType type, int numShares, double price)
+	{
+		if(!simulation) {
+			String order = OrderBuilder.limitOrder(type.toString(), symbol, numShares, price);
+			String response =  Client.placeOrder(order);
+			System.out.println(response);
+		}
+	}
+
+	public static Trade placeMarketOrder(String symbol, OrderType type, int numShares)
 	{
 		if(!simulation) {
 			String order = OrderBuilder.marketOrder(type.toString(), symbol, numShares);
@@ -52,7 +61,9 @@ public class TDARequest
 		}
 	}
 
-	//Complete
+
+
+	//Complete un for request graeter than 500
 	public static ArrayList<Quote> getQuotes(ArrayList<String> arr)
 	{
 		//TODO: modify arr becuase it is cycling through all the symbols when parsing the resonses
@@ -64,29 +75,49 @@ public class TDARequest
 		ArrayList<String> requests = new ArrayList<>(arr.size() / 500 + 1);
 		ArrayList<Quote> quotes = new ArrayList<>();
 		StringBuilder symbols = new StringBuilder();
-		for(int i = 0, j = 1; i < arr.size(); ++i, ++j)
+
+
+		//TODO: remove redundancy
+		if(arr.size() < 500)
 		{
-			if(j <= 500)
+
+			for(String cur : arr)
 			{
-				symbols.append(arr.get(i)).append(",");
+				symbols.append(cur).append(",");
 			}
-			else
+
+			symbols.deleteCharAt(symbols.length() - 1);
+			String cur = symbols.toString();
+			String request = String.format("https://api.tdameritrade.com/v1/marketdata/quotes?symbol=%s",cur);
+			requests.add(request);
+		}
+		else
+		{
+			for(int i = 0, j = 1; i < arr.size(); ++i, ++j)
 			{
-				j = 1;
+				if(j <= 500)
+				{
+					symbols.append(arr.get(i)).append(",");
+				}
+				else
+				{
+					j = 1;
+					symbols.deleteCharAt(symbols.length() - 1);
+					String cur = symbols.toString();
+					String request = String.format("https://api.tdameritrade.com/v1/marketdata/quotes?symbol=%s",cur);
+					requests.add(request);
+					symbols = new StringBuilder();
+				}
+			}
+
+			if(symbols.length() > 0)
+			{
 				symbols.deleteCharAt(symbols.length() - 1);
-				String cur = symbols.toString();
-				String request = String.format("https://api.tdameritrade.com/v1/marketdata/quotes?symbol=%s",cur);
+				String request = String.format("https://api.tdameritrade.com/v1/marketdata/quotes?symbol=%s",symbols);
 				requests.add(request);
-				symbols = new StringBuilder();
 			}
 		}
 
-		if(symbols.length() > 0)
-		{
-			symbols.deleteCharAt(symbols.length() - 1);
-			String request = String.format("https://api.tdameritrade.com/v1/marketdata/quotes?symbol=%s",symbols);
-			requests.add(request);
-		}
 
 		//Sending Requests
 		System.out.print("Sending Requests ->");

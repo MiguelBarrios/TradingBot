@@ -22,24 +22,16 @@ public class Log
     public Log(String directory)
     {
         //Initilize files and directories
-        tradesFile =  mkdir(directory + "/Trades");
-        String[] tradesHeader = {"Trade Type", "Symbol", "amount", "Idv Price", "Total  Price", "TOE"};
-        addHeader(tradesFile, tradesHeader);
-
-
         quotesFile = mkdir(directory + "/Quotes");
         String[] quotesHeader = {"SYMBOL", "BID_PRICE", "BID_SIZE", "ASK_PRICE", "ASK_SIZE", "NET_CHANGE", "VOLUME", "SHORTABLE", "VOLITILITY", "CHANGE", "TIME"};
         addHeader(quotesFile, quotesHeader);
-
-
+        
         moversFile =  mkdir(directory + "/Movers");
         String[] moversHeader = {"Symbol", "lastPrice", "Direction", "Change", "Volume", "Time"};
         addHeader(moversFile, moversHeader);
 
         resultsFile =  mkdir(directory + "/Results");
-        String[] resultsSummary = {Results.getTotalProfits()};
         String[] resultsHeader = {"Symbol", "ShortPosition" ,"BuyPrice", "SellPrice", "profit"};
-        addHeader(resultsFile, resultsSummary);
         addHeader(resultsFile, resultsHeader);
     }
 
@@ -48,7 +40,7 @@ public class Log
         Date cur = new Date();
 
         //Make directory if DNE
-        String directoryPath = mainDirectory + directory + "/" + yearMonth.format(cur);
+        String directoryPath = mainDirectory + directory;
         (new File(directoryPath)).mkdirs();
 
         return new File(directoryPath + "/" + yearMonthDay.format(cur) + ".csv");
@@ -110,7 +102,6 @@ public class Log
             CSVWriter writer = new CSVWriter(outputFile);
 
             writer.writeNext(mover.csvFormat());
-
 
             writer.close();
         }

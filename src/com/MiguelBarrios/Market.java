@@ -32,9 +32,7 @@ public class Market
         Date cur = new Date();
         cur.setYear(2020);
         long now = cur.getTime();
-        System.out.println("Waiting for: " + time.format(now));
     	return (now > startTrading) && (now < stopTrading);
-
     }
 
     public void waitForMarketToOpen() throws InterruptedException
@@ -42,9 +40,12 @@ public class Market
         Date now = new Date();
         now.setYear(2020);
         long waitTime = startTrading - now.getTime();
-        System.out.println("Waiting for:  " + waitTime);
-        TimeUnit.MILLISECONDS.sleep(waitTime);
 
+        if(waitTime > 0)
+        {
+            System.out.println("Waiting for:  " + waitTime);
+            TimeUnit.MILLISECONDS.sleep(waitTime);
+        }
 
         Clock clock = new Clock(this);
         clock.start();
