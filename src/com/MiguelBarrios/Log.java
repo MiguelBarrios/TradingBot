@@ -25,7 +25,7 @@ public class Log
         quotesFile = mkdir(directory + "/Quotes");
         String[] quotesHeader = {"SYMBOL", "BID_PRICE", "BID_SIZE", "ASK_PRICE", "ASK_SIZE", "NET_CHANGE", "VOLUME", "SHORTABLE", "VOLITILITY", "CHANGE", "TIME"};
         addHeader(quotesFile, quotesHeader);
-        
+
         moversFile =  mkdir(directory + "/Movers");
         String[] moversHeader = {"Symbol", "lastPrice", "Direction", "Change", "Volume", "Time"};
         addHeader(moversFile, moversHeader);

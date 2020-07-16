@@ -9,14 +9,16 @@ import java.util.concurrent.TimeUnit;
 
 public class Main
 {
+    //TODO: change form limit order to trailing stop order
+
     public static String split = "########################################\n########################################";
 
     public static void main(String[] args) throws InterruptedException
     {
 
         TDARequest.setSimulation(true);
-        Date startTrading = new Date(2020, Calendar.JULY, 15, 8, 30);
-        Date stopTrading = new Date(2020, Calendar.JULY, 15, 14, 55);
+        Date startTrading = new Date(2020, Calendar.JULY, 16, 8, 30);
+        Date stopTrading = new Date(2020, Calendar.JULY, 16, 14, 55);
         Market market = new Market(startTrading, stopTrading);
         market.waitForMarketToOpen();
         TimeUnit.SECONDS.sleep(10);
@@ -113,7 +115,12 @@ public class Main
         Log.saveResults(list);
     }
 
-
+    public static double sellPrice(double price, double percent, boolean shortPosition)
+    {
+        int direction = (shortPosition) ? 1 : -1;
+        return price + direction * (price * percent);
+    }
 }
+
 
 
