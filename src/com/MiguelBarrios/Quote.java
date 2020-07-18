@@ -1,7 +1,11 @@
 package com.MiguelBarrios;
 
+import java.text.SimpleDateFormat;
+
 public class Quote
 {
+    public static final SimpleDateFormat dft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+
     private final String symbol;
 
     private final  double bidprice;
@@ -18,7 +22,7 @@ public class Quote
 
     private final int totalVolume;
 
-    private final double volitility;
+    private final double volatility;
 
     private final double regularMarketNetChange;
 
@@ -34,7 +38,7 @@ public class Quote
         this.netChange = netChange;
         this.totalVolume = totalVolume;
         this.shortable = shortable;
-        this.volitility = volitility;
+        this.volatility = volitility;
         this.regularMarketNetChange = regularMarketNetChange;
         this.time = System.currentTimeMillis();
     }
@@ -49,9 +53,9 @@ public class Quote
                 String.valueOf(netChange),
                 String.valueOf(totalVolume),
                 String.valueOf(shortable),
-                String.valueOf(volitility),
+                String.valueOf(volatility),
                 String.valueOf(regularMarketNetChange),
-                String.valueOf(time)
+                String.valueOf(dft.format(time))
         };
 
         return arr;

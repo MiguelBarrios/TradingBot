@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 public class Account
 {
+    //List of all currently held positions
     private ArrayList<Position> activePositions;
 
     private double initialBalance;
@@ -16,7 +17,6 @@ public class Account
     public Account()
     {
         updateAccountInfo();
-        new Log("TopMovers");
     }
 
     public void updateAccountInfo()
@@ -29,29 +29,9 @@ public class Account
         activePositions = summary.activePositions;
     }
 
-    public ArrayList<Position> getActivePositions()
+    public boolean hasAvailableFunds(Double buyPrice)
     {
-        return activePositions;
-    }
-
-    public double getInitialBalance()
-    {
-        return initialBalance;
-    }
-
-    public double getAvailableFunds()
-    {
-        return availableFunds;
-    }
-
-    public double getBuyingPower()
-    {
-        return buyingPower;
-    }
-
-    public double getAccountValue()
-    {
-        return accountValue;
+        return (availableFunds > buyPrice);
     }
 
     @Override
@@ -64,9 +44,7 @@ public class Account
         sb.append(", accountValue=").append(accountValue).append("}\n");
 
         for(Position pos : activePositions)
-        {
             sb.append(pos.toString()).append("\n");
-        }
 
         return sb.toString();
     }

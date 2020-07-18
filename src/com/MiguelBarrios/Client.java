@@ -24,7 +24,7 @@ public class Client
         }
         catch (Exception e)
         {
-            System.out.println("Error: Sending request");
+            e.printStackTrace();
             return "";
         }
     }
@@ -55,7 +55,6 @@ public class Client
         }
         catch (Exception e)
         {
-            System.out.println("Error getting request");
             e.printStackTrace();
         }
 
@@ -64,7 +63,7 @@ public class Client
 
 
 
-    public static String placeOrder(String post_data)
+    public static int placeOrder(String post_data)
     {
         String urlString = String.format("https://api.tdameritrade.com/v1/accounts/%s/orders", Config.accountID);
 
@@ -85,12 +84,17 @@ public class Client
                 os.write(input, 0, input.length);
             }
 
-            return readResponse(httpURLConnection);
+
+            String response = readResponse(httpURLConnection);
+            if(response.length() > 0)
+                System.out.println(response);
+
+            return httpURLConnection.getResponseCode();
         }
         catch (Exception e)
         {
-            System.out.println("Error Client: placeOrder()");
-            return "";
+            e.printStackTrace();
+            return 999;
         }
     }
 
@@ -112,7 +116,7 @@ public class Client
         }
         catch (Exception e)
         {
-            System.out.println("Error getting request");
+            e.printStackTrace();
             return "";
         }
     }
@@ -135,6 +139,7 @@ public class Client
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             return "";
         }
     }

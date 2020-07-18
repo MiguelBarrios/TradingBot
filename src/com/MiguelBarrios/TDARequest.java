@@ -12,31 +12,46 @@ public class TDARequest
 		TDARequest.simulation = simulation;
 	}
 
-	public static void placeLimitOrder(String symbol, OrderType type, int numShares, double price)
+	public static boolean placeBuySellOrder(String symbol, int quantity, double buyPrice, double sellPrice)
+	{
+		if(!simulation) {
+			String order = OrderBuilder.trailingBuySellOrder(symbol, quantity, buyPrice, sellPrice);
+			int responseCode =  Client.placeOrder(order);
+			return (responseCode < 300);
+		}
+
+		return true;
+	}
+
+
+	public static void placeTrailingOrder(String symbol, OrderType buySell, int quantity, double stopPriceOffset)
+	{
+		String out = OrderBuilder.trailingOrder(buySell.toString(), symbol, quantity, stopPriceOffset);
+		System.out.println(out);
+	}
+
+	public static boolean placeLimitOrder(String symbol, OrderType type, int numShares, double price)
 	{
 		if(!simulation) {
 			String order = OrderBuilder.limitOrder(type.toString(), symbol, numShares, price);
-			String response =  Client.placeOrder(order);
-			System.out.println(response);
+			int responseCode =  Client.placeOrder(order);
+			return (responseCode < 300);
+		}
+		else
+		{
+			return true;
 		}
 	}
 
-	public static Trade placeMarketOrder(String symbol, OrderType type, int numShares)
+	public static boolean placeMarketOrder(String symbol, OrderType type, int numShares)
 	{
 		if(!simulation) {
 			String order = OrderBuilder.marketOrder(type.toString(), symbol, numShares);
-			String response =  Client.placeOrder(order);
-			System.out.println(response);
+			int responseCode =  Client.placeOrder(order);
+			return (responseCode < 300);
 		}
 
-		//TODO: find a way to check the price if simulation is off, then everthing below is unnesesary
-		Quote quote = getQuote(symbol);
-		if(quote != null) {
-			double price = (type == OrderType.SELL) ? quote.getBidprice() : quote.getAskPrice();
-			return new Trade(type, numShares, price, symbol);
-		}
-
-		return null;
+		return true;
 	}
 
 	public static AccountSummary getAccountInfo()
@@ -142,8 +157,16 @@ public class TDARequest
 	{
 		ArrayList<Mover> movers = topMovers(Exchange.SMP, direction, change);
 		movers.addAll(topMovers(Exchange.NASDAQ, direction, change));
-
 		return movers;
+	}
+
+	public static ArrayList<Mover> getAllMovers()
+	{
+		ArrayList<Mover> topMovers = TDARequest.allTopMovers("up", "percent");
+		topMovers.addAll(TDARequest.allTopMovers("up", "value"));
+		topMovers.addAll(TDARequest.allTopMovers("down", "percent"));
+		topMovers.addAll(TDARequest.allTopMovers("down", "value"));
+		return topMovers;
 	}
 
 	//Need to update refresh token july 24
@@ -161,6 +184,20 @@ public class TDARequest
 		Config.updateAuthToken(authToken);
 	}
 
+	public static Market getMarketHours()
+	{
+		//TODO: fix
+		int month = ZonedDateTime.now().getDayOfMonth();
+		int day = ZonedDateTime.now().getMonthValue();
+		int year = ZonedDateTime.now().getYear();
+
+		String request =  String.format("https://api.tdameritrade.com/v1/marketdata/EQUITY/hours?apikey=%s&date=%4d-%02d-%02d",
+				Config.apiKey, year, day, month);
+
+		String response = Client.sendRequest(request);
+
+		return Parser.parseMarketHours(response);
+	}
 
 
 

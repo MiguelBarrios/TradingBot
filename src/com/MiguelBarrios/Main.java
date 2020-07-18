@@ -1,125 +1,90 @@
 package com.MiguelBarrios;
-
-import jdk.swing.interop.SwingInterOpUtils;
-
-import java.lang.reflect.Array;
-import java.time.Year;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Main
 {
-    //TODO: change form limit order to trailing stop order
-
-    public static String split = "########################################\n########################################";
-
     public static void main(String[] args) throws InterruptedException
     {
+        Market mar = TDARequest.getMarketHours();
+        Market.waitForMarketToOpen();
+        System.exit(-1);
+        //Max price willing to pay per equity
+        double MAX_PRICE = 10;
+        int QUANTITY = 1;
 
+        //will determine if actual orders are placed
         TDARequest.setSimulation(true);
-        Date startTrading = new Date(2020, Calendar.JULY, 16, 8, 30);
-        Date stopTrading = new Date(2020, Calendar.JULY, 16, 14, 55);
-        Market market = new Market(startTrading, stopTrading);
-        market.waitForMarketToOpen();
-        TimeUnit.SECONDS.sleep(10);
+        Market market = TDARequest.getMarketHours();
+
+        System.out.println(market);
+
         Account account = new Account();
-        new Log("TopMovers");
+
         //For this strategy we will only purchase each equity once
         HashMap<String, Mover> movers = new HashMap<>();
 
+        int iterations = 0;
         while (market.isOpen())
         {
-            System.out.println("Getting top movers");
-            ArrayList<Mover> topMovers = TDARequest.allTopMovers("up", "percent");
-            topMovers.addAll(TDARequest.allTopMovers("up", "value"));
-            topMovers.addAll(TDARequest.allTopMovers("down", "percent"));
-            topMovers.addAll(TDARequest.allTopMovers("down", "value"));
-
+            ArrayList<Mover> topMovers = TDARequest.getAllMovers();
             for (Mover mover : topMovers)
             {
-                if(!movers.containsKey(mover.getSymbol()))
-                {
-                    movers.put(mover.getSymbol(), mover);
-                    Log.saveMover(mover);
-                }
-            }
-
-
-            //Buy Logic
-            /*
-            for(Mover mover : topGainers) //Purchase stocks that we have not encountered
-            {
                 String tickerSymbol = mover.getSymbol();
-                if(previouslyEncountered.add(tickerSymbol))
+                if(!movers.containsKey(tickerSymbol))
                 {
-                    Trade trade = TDARequest.placeOrder(tickerSymbol, OrderType.BUY, NUM_SHARES);
-                    if(trade == null) {
-                        System.out.println("Order not placed");
-                    }
-                    else {
-                        log.saveTrade(trade);
+                    //TODO: find out what values maximize returns
+                    double currentPrice = mover.getLast();
+                    double buyPrice = getTrailValue(currentPrice, .005);
+                    double sellPrice = getTrailValue(currentPrice, 0.01);
+
+                    //TODO: once margin requirements are met remove last condition
+                    //initial movers are unpredictable, iterations > 240 is so that the initial one  die out
+                    if(account.hasAvailableFunds(buyPrice) && buyPrice < MAX_PRICE && iterations > 240 && mover.getDirection().equalsIgnoreCase("up"))
+                    {
+                        boolean orderPlaced = TDARequest.placeBuySellOrder(tickerSymbol, QUANTITY, buyPrice, sellPrice);
+                        if(orderPlaced) {
+                            System.out.println("OrderPlaced: " + tickerSymbol);
+                        }
                     }
 
-                    log.saveMover(mover);
+                    movers.put(tickerSymbol, mover);
                 }
             }
 
-            //Get updated account info
-            account.updateAccountInfo();
-            System.out.println(account);
-            ArrayList<Position> positions = account.getActivePositions();
+            ++iterations;
 
-            for(Position position : positions)
-            {
-                double change = position.getcurrentDayProfitLossPercentage();
-                if(change < -1)
-                {
-                    System.out.println("sell: " + position.getSymbol());
-                }
-            }
-            */
-
-            //TODO: implement sell logic buy using account position profitlosschange
-            //Inorder to avoid 429 error
+            //Prices don't fluctuate that much every second
             TimeUnit.SECONDS.sleep(5);
         }
 
-        //---------------- For testing only ------------------------------------
-        //Get quotes for all stocks that would have been purchased
-        //TODO: why is it adding each symbol twice?
-        System.out.println(split);
-        System.out.println("Mover size: " + movers.size());
-        System.out.println("Movers keyset size: " + movers.keySet().size());
-        ArrayList<String> symbols = new ArrayList<>(movers.size());
-        symbols.addAll(movers.keySet());
 
-        System.out.println("Symbols size: " + symbols.size());
-
-
-        ArrayList<Quote> quotes = TDARequest.getQuotes(symbols);
-        System.out.println("quotes.size() = " + quotes.size());
-        System.out.println(split);
-        Log.saveQuotes(quotes);
-
+        //---------------- For analysis only ------------------------------------
         //Results  if we close position the same day
         ArrayList<Results> list = new ArrayList<>();
+
+        //Get quotes for all stocks that would have been purchased
+        ArrayList<Quote> quotes = TDARequest.getQuotes(new ArrayList<>(movers.keySet()));
         for(Quote quote : quotes)
         {
             String symbol = quote.getSymbol();
-            Results results = new Results(movers.get(symbol), quote);
-            list.add(results);
-            System.out.println(results);
+            list.add(new Results(movers.get(symbol), quote));
         }
 
         System.out.println(Results.getTotalProfits());
+
+        new Log("TopMovers");
         Log.saveResults(list);
+        Log.saveQuotes(quotes);
+        Log.saveMovers(movers);
     }
 
-    public static double sellPrice(double price, double percent, boolean shortPosition)
+    public static double getTrailValue(double currentPrice, double percentOffset)
     {
-        int direction = (shortPosition) ? 1 : -1;
-        return price + direction * (price * percent);
+        return currentPrice * percentOffset;
     }
+
 }
 
 

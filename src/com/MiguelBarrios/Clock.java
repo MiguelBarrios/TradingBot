@@ -19,7 +19,7 @@ public class Clock extends Thread
             TDARequest.refreshAuthToken();
             System.out.println("AuthToken Refreshed");
             try {
-                TimeUnit.MINUTES.sleep(29);
+                TimeUnit.MINUTES.sleep(28);
             }
             catch (Exception e) {
                 TDARequest.refreshAuthToken();

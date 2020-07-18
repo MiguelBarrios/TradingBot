@@ -1,7 +1,5 @@
 package com.MiguelBarrios;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class AccountSummary
 {

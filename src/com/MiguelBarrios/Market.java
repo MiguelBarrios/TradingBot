@@ -1,61 +1,80 @@
 package com.MiguelBarrios;
-import java.time.Year;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class Market
 {
-    public static SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    public static final SimpleDateFormat dft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
-    public static SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-    public static SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
-    //String formattedTime = output.format(d);
+    private final Calendar preMarketOpen;
 
+    private final Calendar regularMarketOpen;
 
-    public long startTrading;
+    private final Calendar regularMarketClose;
 
-    public long stopTrading;
+    private final Calendar extendedHoursClose;
 
-    public Market(Date startTrading, Date stopTrading)
+    public Market(Date preMarketOpen, Date regularMarketOpen, Date regularMarketClose, Date extendedHoursClose)
     {
-        this.startTrading = startTrading.getTime();
-        this.stopTrading = stopTrading.getTime();
-        System.out.println("Trading session");
-        System.out.println(startTrading + " -> " + stopTrading);
+        this.preMarketOpen = Calendar.getInstance();
+        this.regularMarketOpen = Calendar.getInstance();
+        this.regularMarketClose = Calendar.getInstance();
+        this.extendedHoursClose = Calendar.getInstance();
 
+        this.preMarketOpen.setTime(preMarketOpen);
+        this.regularMarketOpen.setTime(regularMarketOpen);
+        this.regularMarketClose.setTime(regularMarketClose);
+        this.extendedHoursClose.setTime(extendedHoursClose);
     }
 
+    //if we want to trade from start of pre market to after hours market
     public boolean isOpen()
     {
-        Date cur = new Date();
-        cur.setYear(2020);
-        long now = cur.getTime();
-    	return (now > startTrading) && (now < stopTrading);
+        return isOpen(false, false);
     }
 
-    public void waitForMarketToOpen() throws InterruptedException
+    public boolean isOpen(boolean pre, boolean afterHours)
     {
-        Date now = new Date();
-        now.setYear(2020);
-        long waitTime = startTrading - now.getTime();
+        Date cur = new Date(System.currentTimeMillis());
 
-        if(waitTime > 0)
+        if(!pre && !afterHours)
         {
-            System.out.println("Waiting for:  " + waitTime);
-            TimeUnit.MILLISECONDS.sleep(waitTime);
+            return (cur.after(regularMarketOpen.getTime()) && cur.before(regularMarketClose.getTime()));
         }
+        else if(pre && afterHours)
+        {
+            return (cur.after(preMarketOpen.getTime()) && cur.before(extendedHoursClose.getTime()));
+        }
+        else if(pre)
+        {
+            return (cur.after(preMarketOpen.getTime()) && cur.before(regularMarketClose.getTime()));
+        }
+        else
+        {
+            return (cur.after(regularMarketOpen.getTime()) && cur.before(extendedHoursClose.getTime()));
+        }
+    }
 
-        Clock clock = new Clock(this);
-        clock.start();
+    public static void waitForMarketToOpen() throws InterruptedException
+    {
+        //TODO: implement
+
     }
 
     @Override
     public String toString()
     {
-    	return "";
+        return String.format("Market Hours: %s\nPreMarket open: %s\nRegularMarketOpen: %s\nRegularMarketClose: %s\nExtended Market Close: %s",
+                dateFormat.format(regularMarketOpen.getTime()),
+                timeFormat.format(preMarketOpen.getTime()),
+                timeFormat.format(regularMarketOpen.getTime()),
+                timeFormat.format(regularMarketClose.getTime()),
+                timeFormat.format(extendedHoursClose.getTime()));
     }
-
-
 }

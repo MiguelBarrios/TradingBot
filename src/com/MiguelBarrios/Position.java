@@ -2,20 +2,20 @@ package com.MiguelBarrios;
 
 public class Position
 {
-    private String symbol;
-    private String cusip;
+    private final String symbol;
+    private final String cusip;
 
-    private double currentDayProfitLoss;
-    private double currentDayProfitLossPercentage;
+    private final double currentDayProfitLoss;
+    private final double currentDayProfitLossPercentage;
 
-    private int longQuantity;
-    private int settledLongQuantity;
+    private final int longQuantity;
+    private final int settledLongQuantity;
 
-    private int settledShortQuantity;
-    private int shortQuantity;
+    private final int settledShortQuantity;
+    private final int shortQuantity;
 
-    private double marketValue;
-    private double averagePrice;
+    private final double marketValue;
+    private final double averagePrice;
 
     public Position(String symbol, String cusip, double currentDayProfitLoss, double currentDayProfitLossPercentage, int longQuantity, int settledLongQuantity, int settledShortQuantity, int shortQuantity, double marketValue, double averagePrice)
     {
@@ -29,23 +29,6 @@ public class Position
         this.shortQuantity = shortQuantity;
         this.marketValue = marketValue;
         this.averagePrice = averagePrice;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "Position{" +
-                "symbol='" + symbol + '\'' +
-                ", cusip='" + cusip + '\'' +
-                ", currentDayProfitLoss=" + currentDayProfitLoss +
-                ", currentDayProfitLossPercentage=" + currentDayProfitLossPercentage +
-                ", longQuantity=" + longQuantity +
-                ", settledLongQuantity=" + settledLongQuantity +
-                ", settledShortQuantity=" + settledShortQuantity +
-                ", shortQuantity=" + shortQuantity +
-                ", marketValue=" + marketValue +
-                ", averagePrice=" + averagePrice +
-                '}';
     }
 
     public String getSymbol()
@@ -96,5 +79,22 @@ public class Position
     public double getAveragePrice()
     {
         return averagePrice;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Position{" +
+                "symbol='" + symbol + '\'' +
+                ", cusip='" + cusip + '\'' +
+                ", currentDayProfitLoss=" + currentDayProfitLoss +
+                ", currentDayProfitLossPercentage=" + currentDayProfitLossPercentage +
+                ", longQuantity=" + longQuantity +
+                ", settledLongQuantity=" + settledLongQuantity +
+                ", settledShortQuantity=" + settledShortQuantity +
+                ", shortQuantity=" + shortQuantity +
+                ", marketValue=" + marketValue +
+                ", averagePrice=" + averagePrice +
+                '}';
     }
 }

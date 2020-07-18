@@ -2,11 +2,10 @@ package com.MiguelBarrios;
 import com.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
+import java.util.HashMap;
 
 public class Log
 {
@@ -15,7 +14,6 @@ public class Log
     private static final String mainDirectory = "/Users/miguelbarrios/Documents/Projects/Logs/";
 
     private static File quotesFile;
-    private static  File tradesFile;
     private static File moversFile;
     private static File resultsFile;
 
@@ -63,20 +61,6 @@ public class Log
 
     }
 
-    public static void saveTrade(Trade trade)
-    {
-        try{
-            FileWriter outputfile = new FileWriter(tradesFile, true);
-            CSVWriter writer = new CSVWriter(outputfile);
-
-            writer.writeNext(trade.cvsFormat());
-            writer.close();
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-    }
-
     public static void saveQuotes(ArrayList<Quote> quotes)
     {
         try {
@@ -93,6 +77,23 @@ public class Log
             //DO NOTHING
         }
 
+    }
+
+    public static void saveMovers(HashMap<String, Mover> map)
+    {
+        try {
+            FileWriter outputFile = new FileWriter(moversFile, true);
+            CSVWriter writer = new CSVWriter(outputFile);
+
+            for(Mover mover : map.values()) {
+                writer.writeNext(mover.csvFormat());
+            }
+
+            writer.close();
+        }
+        catch (Exception e) {
+            //DO NOTHING
+        }
     }
 
     public static void saveMover(Mover mover)
