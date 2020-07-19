@@ -1,4 +1,5 @@
 package com.MiguelBarrios;
+import java.sql.Time;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
@@ -61,10 +62,39 @@ public class Market
         }
     }
 
-    public static void waitForMarketToOpen() throws InterruptedException
+    public static Market waitForMarketToOpen() throws InterruptedException
     {
-        //TODO: implement
+        Market market = TDARequest.getMarketHours();
+        //Weekend
+        while(market == null)
+        {
+            int hourOfDay = ZonedDateTime.now().getHour();
+            System.out.println("Waiting for " + (24 - hourOfDay) + " hrs");
+            TimeUnit.HOURS.sleep(24 - hourOfDay);
+            market = TDARequest.getMarketHours();
+        }
 
+        //past market hours need next day
+        if(market.preMarketOpen.getTime().getHours() > 16)
+        {
+            int hourOfDay = ZonedDateTime.now().getHour();
+            System.out.println("Waiting for " + (24 - hourOfDay) + " hrs");
+            TimeUnit.HOURS.sleep(24 - hourOfDay);
+            market = TDARequest.getMarketHours();
+        }
+
+        long open = market.regularMarketOpen.getTime().getTime();
+
+        Date cur = new Date();
+        cur.setYear(ZonedDateTime.now().getYear());
+
+        long waitTime = open - cur.getTime();
+        int minuts = (int)TimeUnit.MILLISECONDS.toMinutes(waitTime) % 60;
+        int hour = (int)TimeUnit.MILLISECONDS.toHours(waitTime);
+
+        System.out.println("Waiting for %d hrs %d min");
+        TimeUnit.MILLISECONDS.sleep(waitTime);
+        return market;
     }
 
     @Override
