@@ -124,4 +124,5 @@ public class OrderBuilder
     {
         return String.format(marketOrderTemplate, MARKET, instruction , quantity, symbol);
     }
+
 }

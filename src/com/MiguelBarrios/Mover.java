@@ -25,23 +25,6 @@ public class Mover
         this.totalVolume = totalVolume;
     }
 
-    public String[] csvFormat()
-    {
-        //{"Symbol", "lastPrice", "Direction", "Change", "Volume", "Time"};
-        long now = System.currentTimeMillis();
-
-
-
-        String[] arr = {symbol,
-                        String.valueOf(getLast()),
-                        direction,
-                        String.valueOf(change),
-                        String.valueOf(totalVolume),
-                        sdf.format(now)};
-
-        return arr;
-    }
-
     public double getChange()
     {
         return change;

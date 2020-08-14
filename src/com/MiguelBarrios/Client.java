@@ -41,7 +41,7 @@ public class Client
             String auth = String.format("Bearer %s", Config.getAuthToken());
             httpURLConnection.setRequestProperty("Authorization", auth);
 
-            String line = "";
+            String line;
             InputStreamReader inputStreamReader = new InputStreamReader(httpURLConnection.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             StringBuilder response = new StringBuilder();
@@ -94,7 +94,7 @@ public class Client
         catch (Exception e)
         {
             e.printStackTrace();
-            return 999;
+            return -999;
         }
     }
 

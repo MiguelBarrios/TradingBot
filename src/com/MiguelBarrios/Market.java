@@ -1,10 +1,7 @@
 package com.MiguelBarrios;
-import java.sql.Time;
-import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class Market
@@ -13,34 +10,40 @@ public class Market
     public static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
-    private final Calendar preMarketOpen;
+    private static Calendar preMarketOpen;
 
-    private final Calendar regularMarketOpen;
+    private static Calendar regularMarketOpen;
 
-    private final Calendar regularMarketClose;
+    private static Calendar regularMarketClose;
 
-    private final Calendar extendedHoursClose;
+    private static Calendar extendedHoursClose;
+
+    private static boolean tradeExtendedHours = false;
 
     public Market(Date preMarketOpen, Date regularMarketOpen, Date regularMarketClose, Date extendedHoursClose)
     {
-        this.preMarketOpen = Calendar.getInstance();
-        this.regularMarketOpen = Calendar.getInstance();
-        this.regularMarketClose = Calendar.getInstance();
-        this.extendedHoursClose = Calendar.getInstance();
+        Market.preMarketOpen = Calendar.getInstance();
+        Market.regularMarketOpen = Calendar.getInstance();
+        Market.regularMarketClose = Calendar.getInstance();
+        Market.extendedHoursClose = Calendar.getInstance();
 
-        this.preMarketOpen.setTime(preMarketOpen);
-        this.regularMarketOpen.setTime(regularMarketOpen);
-        this.regularMarketClose.setTime(regularMarketClose);
-        this.extendedHoursClose.setTime(extendedHoursClose);
+        Market.preMarketOpen.setTime(preMarketOpen);
+        Market.regularMarketOpen.setTime(regularMarketOpen);
+        Market.regularMarketClose.setTime(regularMarketClose);
+        Market.extendedHoursClose.setTime(extendedHoursClose);
     }
 
-    //if we want to trade from start of pre market to after hours market
-    public boolean isOpen()
+    public static void setTradeExtendedHours()
     {
-        return isOpen(false, false);
+        tradeExtendedHours = true;
     }
 
-    public boolean isOpen(boolean pre, boolean afterHours)
+    public static boolean tradeExtendedHours()
+    {
+        return tradeExtendedHours;
+    }
+
+    public static boolean isOpen(boolean pre, boolean afterHours)
     {
         Date cur = new Date(System.currentTimeMillis());
 
@@ -62,39 +65,32 @@ public class Market
         }
     }
 
-    public static Market waitForMarketToOpen() throws InterruptedException
+    public static void waitForMarketToOpen() throws InterruptedException
     {
-        Market market = TDARequest.getMarketHours();
-        //Weekend
-        while(market == null)
+        Calendar now = Calendar.getInstance();
+
+        //Regular market open as 8:30 -> 3:00
+        int hourOfDay = now.get(Calendar.HOUR_OF_DAY);
+        int minute = now.get(Calendar.MINUTE);
+
+        //Starting program the day before
+        int remainingHours;
+        int remainingMinutes;
+        if(hourOfDay > 16)
         {
-            int hourOfDay = ZonedDateTime.now().getHour();
-            System.out.println("Waiting for " + (24 - hourOfDay) + " hrs");
-            TimeUnit.HOURS.sleep(24 - hourOfDay);
-            market = TDARequest.getMarketHours();
+            remainingHours = 8 + (23 - hourOfDay);
+        }
+        else  // Starting program the day of
+        {
+            remainingHours = 8 - (23 - hourOfDay);
         }
 
-        //past market hours need next day
-        if(market.preMarketOpen.getTime().getHours() > 16)
-        {
-            int hourOfDay = ZonedDateTime.now().getHour();
-            System.out.println("Waiting for " + (24 - hourOfDay) + " hrs");
-            TimeUnit.HOURS.sleep(24 - hourOfDay);
-            market = TDARequest.getMarketHours();
-        }
+        remainingMinutes = 30 + (60 - minute);
+        int waitTime = (60 * remainingHours) + remainingMinutes;
+        int hours = waitTime / 60;
+        int minutes = waitTime % 60;
 
-        long open = market.regularMarketOpen.getTime().getTime();
-
-        Date cur = new Date();
-        cur.setYear(ZonedDateTime.now().getYear());
-
-        long waitTime = open - cur.getTime();
-        int minuts = (int)TimeUnit.MILLISECONDS.toMinutes(waitTime) % 60;
-        int hour = (int)TimeUnit.MILLISECONDS.toHours(waitTime);
-
-        System.out.println("Waiting for %d hrs %d min");
-        TimeUnit.MILLISECONDS.sleep(waitTime);
-        return market;
+        TimeUnit.MINUTES.sleep(waitTime);
     }
 
     @Override

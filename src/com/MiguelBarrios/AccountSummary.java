@@ -21,5 +21,4 @@ public class AccountSummary
         this.accountValue = accountValue;
         this.activePositions = activePositions;
     }
-
 }

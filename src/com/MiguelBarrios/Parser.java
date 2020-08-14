@@ -1,13 +1,9 @@
 package com.MiguelBarrios;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import javax.xml.bind.SchemaOutputResolver;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 public class Parser
 {
@@ -50,7 +46,7 @@ public class Parser
 
         }catch (Exception e)
         {
-            System.out.println("ErrorParsing Movers");
+            e.printStackTrace();
             return new ArrayList<>(0);
         }
     }
@@ -73,7 +69,7 @@ public class Parser
         }
         catch (Exception e)
         {
-            //do nothing
+            e.printStackTrace();
         }
         return null;
     }
@@ -109,11 +105,11 @@ public class Parser
         JSONObject securitiesAccount = json.getJSONObject("securitiesAccount");
         JSONObject initialBalances = securitiesAccount.getJSONObject("initialBalances");
         JSONObject currentBalances = securitiesAccount.getJSONObject("currentBalances");
+        JSONObject projectedBalances = securitiesAccount.getJSONObject("projectedBalances");
 
         double accountValue = initialBalances.getDouble("accountValue");
-        double availableFunds = currentBalances.getDouble("availableFunds");
-        double buyingPower =  currentBalances.getDouble("buyingPower");
-
+        double availableFunds = projectedBalances.getDouble("cashAvailableForTrading");
+        double buyingPower =  -1;
 
         //Get active Positions
         JSONArray activePositions = securitiesAccount.getJSONArray("positions");
@@ -121,13 +117,6 @@ public class Parser
         for(int i = 0;  i < activePositions.length(); ++i)
         {
             JSONObject str = activePositions.getJSONObject(i);
-            /*
-            String[] arr = str.toString().split(",");
-            for(String cur : arr)
-            {
-                System.out.println(cur);
-            }
-             */
 
             double currentDayProfitLoss = str.getDouble("currentDayProfitLoss");
             int longQuantity = str.getInt("longQuantity");
@@ -158,7 +147,6 @@ public class Parser
                     .getJSONObject("EQ")
                     .getJSONObject("sessionHours");
 
-
             JSONObject regularMarket = sessionHours.getJSONArray("regularMarket").getJSONObject(0);
             Date regularMarketOpen = sdf.parse(regularMarket.getString("start").substring(0, 19));
             Date regularMarketClose = sdf.parse(regularMarket.getString("end").substring(0, 19));
@@ -176,6 +164,7 @@ public class Parser
 
         }catch (Exception e)
         {
+            e.printStackTrace();
             return null;
         }
 

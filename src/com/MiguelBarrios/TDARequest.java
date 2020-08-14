@@ -76,13 +76,8 @@ public class TDARequest
 		}
 	}
 
-
-
-	//Complete un for request graeter than 500
 	public static ArrayList<Quote> getQuotes(ArrayList<String> arr)
 	{
-		//TODO: modify arr becuase it is cycling through all the symbols when parsing the resonses
-
 		if(arr.size() == 0)
 			return new ArrayList<>();
 
@@ -136,13 +131,6 @@ public class TDARequest
 		return quotes;
 	}
 
-	/**
-	 *
-	 * @param exchange
-	 * @param direction
-	 * @param change can be "percent" or "value"
-	 * @return
-	 */
 	public static ArrayList<Mover> topMovers(Exchange exchange, String direction, String change)
 	{
 		String url = String.format("https://api.tdameritrade.com/v1/marketdata/%s/movers?direction=%s&change=%s",
@@ -178,7 +166,6 @@ public class TDARequest
 							,Config.refreshToknn, Config.apiKey);
 
 		String response = Client.sendRequestPost(urlString, post_data);
-
 		String authToken = Parser.parsAuthToken(response);
 		System.out.println(authToken);
 		Config.updateAuthToken(authToken);
@@ -186,7 +173,6 @@ public class TDARequest
 
 	public static Market getMarketHours()
 	{
-		//TODO: fix
 		int month = ZonedDateTime.now().getDayOfMonth();
 		int day = ZonedDateTime.now().getMonthValue();
 		int year = ZonedDateTime.now().getYear();
@@ -198,11 +184,4 @@ public class TDARequest
 
 		return Parser.parseMarketHours(response);
 	}
-
-
-
-
-
-
-
 }

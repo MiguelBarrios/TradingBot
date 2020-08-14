@@ -43,24 +43,6 @@ public class Quote
         this.time = System.currentTimeMillis();
     }
 
-    public String[] csvFormat()
-    {
-        String[] arr = {symbol,
-                String.valueOf(bidprice),
-                String.valueOf(bidSize),
-                String.valueOf(askPrice),
-                String.valueOf(askSize),
-                String.valueOf(netChange),
-                String.valueOf(totalVolume),
-                String.valueOf(shortable),
-                String.valueOf(volatility),
-                String.valueOf(regularMarketNetChange),
-                String.valueOf(dft.format(time))
-        };
-
-        return arr;
-    }
-
     public String getSymbol()
     {
         return symbol;

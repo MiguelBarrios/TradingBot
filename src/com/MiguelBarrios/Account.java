@@ -3,7 +3,6 @@ import java.util.ArrayList;
 
 public class Account
 {
-    //List of all currently held positions
     private ArrayList<Position> activePositions;
 
     private double initialBalance;
@@ -38,7 +37,7 @@ public class Account
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("Account{, initialBalance=").append(initialBalance);
+        sb.append("Account{initialBalance=").append(initialBalance);
         sb.append(", availableFunds=").append(availableFunds);
         sb.append(", buyingPower=").append(buyingPower);
         sb.append(", accountValue=").append(accountValue).append("}\n");

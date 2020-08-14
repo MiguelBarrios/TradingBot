@@ -1,32 +1,32 @@
 package com.MiguelBarrios;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Main
 {
+    public static double TRAIL_BUY = 0.003;
+
+    public static double TRAIL_SELL = 0.01;
+
+    public static double MAX_PRICE = 15;
+
+    public static int QUANTITY = 1;
+
     public static void main(String[] args) throws InterruptedException
     {
-        Market mar = TDARequest.getMarketHours();
         Market.waitForMarketToOpen();
-        System.exit(-1);
-        //Max price willing to pay per equity
-        double MAX_PRICE = 10;
-        int QUANTITY = 1;
 
         //will determine if actual orders are placed
         TDARequest.setSimulation(true);
-        Market market = TDARequest.getMarketHours();
-
-        System.out.println(market);
-
+        TDARequest.refreshAuthToken();
+        Clock clock = new Clock();
+        clock.start();
         Account account = new Account();
 
         //For this strategy we will only purchase each equity once
         HashMap<String, Mover> movers = new HashMap<>();
 
-        int iterations = 0;
-        while (market.isOpen())
+        while (Market.isOpen(true, false))
         {
             ArrayList<Mover> topMovers = TDARequest.getAllMovers();
             for (Mover mover : topMovers)
@@ -36,55 +36,26 @@ public class Main
                 {
                     //TODO: find out what values maximize returns
                     double currentPrice = mover.getLast();
-                    double buyPrice = getTrailValue(currentPrice, .005);
-                    double sellPrice = getTrailValue(currentPrice, 0.01);
+                    double buyTrail = currentPrice * TRAIL_BUY;
+                    double trailValue = currentPrice * TRAIL_SELL;
 
                     //TODO: once margin requirements are met remove last condition
-                    //initial movers are unpredictable, iterations > 240 is so that the initial one  die out
-                    if(account.hasAvailableFunds(buyPrice) && buyPrice < MAX_PRICE && iterations > 240 && mover.getDirection().equalsIgnoreCase("up"))
+                    double buyPrice = currentPrice + trailValue;
+                    if(account.hasAvailableFunds(buyPrice) && buyPrice < MAX_PRICE && mover.getDirection().equalsIgnoreCase("up"))
                     {
-                        boolean orderPlaced = TDARequest.placeBuySellOrder(tickerSymbol, QUANTITY, buyPrice, sellPrice);
-                        if(orderPlaced) {
-                            System.out.println("OrderPlaced: " + tickerSymbol);
-                        }
+                        boolean orderPlaced = TDARequest.placeBuySellOrder(tickerSymbol, QUANTITY, buyTrail, trailValue);
+                        if(orderPlaced)
+                            System.out.println(String.format("Order placed: symbol = %s, quantity = %d, @ %f", tickerSymbol, QUANTITY, currentPrice + buyTrail));
                     }
 
                     movers.put(tickerSymbol, mover);
                 }
             }
 
-            ++iterations;
-
             //Prices don't fluctuate that much every second
             TimeUnit.SECONDS.sleep(5);
         }
-
-
-        //---------------- For analysis only ------------------------------------
-        //Results  if we close position the same day
-        ArrayList<Results> list = new ArrayList<>();
-
-        //Get quotes for all stocks that would have been purchased
-        ArrayList<Quote> quotes = TDARequest.getQuotes(new ArrayList<>(movers.keySet()));
-        for(Quote quote : quotes)
-        {
-            String symbol = quote.getSymbol();
-            list.add(new Results(movers.get(symbol), quote));
-        }
-
-        System.out.println(Results.getTotalProfits());
-
-        new Log("TopMovers");
-        Log.saveResults(list);
-        Log.saveQuotes(quotes);
-        Log.saveMovers(movers);
     }
-
-    public static double getTrailValue(double currentPrice, double percentOffset)
-    {
-        return currentPrice * percentOffset;
-    }
-
 }
 
 
